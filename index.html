@@ -1,726 +1,933 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WPS SPC 재무 시뮬레이션</title>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WPS × SPC 재무 시뮬레이션</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>
+:root{
+  --navy:#1a2a3a;--navy-light:#2d4a5e;--white:#ffffff;--bg:#f5f7fa;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;
+  --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;
+  --red:#dc2626;--green:#059669;--blue:#2563eb;--amber:#d97706;
+  --th-bg:#e9ecef;--radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--navy);font-size:14px;line-height:1.5}
+.app{max-width:1400px;margin:0 auto;padding:16px}
 
-    :root {
-      --navy: #1a2a3a;
-      --navy-light: #2c4a6a;
-      --accent: #1a2a3a;
-      --text: #1a2a3a;
-      --text-secondary: #4a5568;
-      --border: #d1d9e0;
-      --th-bg: #e9ecef;
-      --page-pad: 48px;
-    }
+/* Header */
+.header{background:var(--navy);color:var(--white);padding:20px 28px;border-radius:var(--radius);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:20px;font-weight:700;letter-spacing:-.3px}
+.header .sub{font-size:12px;opacity:.7;margin-top:2px}
+.header .badge{background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-size:11px}
 
-    body {
-      font-family: 'Pretendard', -apple-system, sans-serif;
-      font-size: 14px;
-      color: var(--text);
-      background: #f5f7fa;
-      line-height: 1.7;
-    }
+/* Tabs */
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--white);padding:4px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.tab-btn{flex:1;padding:10px 8px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;color:var(--gray-500);border-radius:6px;transition:all .2s}
+.tab-btn:hover{background:var(--gray-100)}
+.tab-btn.active{background:var(--navy);color:var(--white)}
+.tab-content{display:none}
+.tab-content.active{display:block}
 
-    /* ─── COVER ─── */
-    .cover {
-      background: #fff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 80px var(--page-pad);
-      border-bottom: 1px solid var(--border);
-    }
+/* Cards grid */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--gray-200)}
+.card h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--navy);display:flex;align-items:center;gap:6px}
+.card h3 .icon{font-size:16px}
 
-    .cover-label {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      margin-bottom: 32px;
-    }
+/* Form elements */
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--gray-600);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px}
+.field input[type=number],.field input[type=time],.field select{width:100%;padding:7px 10px;border:1px solid var(--gray-300);border-radius:5px;font-family:inherit;font-size:13px;background:var(--white);transition:border-color .2s}
+.field input:focus,.field select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 2px rgba(26,42,58,.1)}
+.field .unit{font-size:11px;color:var(--gray-500);margin-top:2px}
+.field .computed{font-weight:700;color:var(--navy);font-size:15px}
+.inline{display:flex;gap:8px;align-items:end}
+.inline .field{flex:1}
+.check-row{display:flex;align-items:center;gap:6px;margin-bottom:10px;font-size:13px}
+.check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--navy)}
+.warn{color:var(--amber);font-size:11px;font-weight:600;margin-top:2px}
 
-    .cover-title {
-      font-size: 38px;
-      font-weight: 700;
-      color: var(--navy);
-      line-height: 1.25;
-      margin-bottom: 16px;
-    }
+/* Mini table inside cards */
+.mini-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.mini-table th{background:var(--th-bg);padding:5px 6px;text-align:center;font-weight:600;border:1px solid var(--gray-200)}
+.mini-table td{padding:5px 6px;text-align:center;border:1px solid var(--gray-200)}
+.mini-table input{width:60px;padding:3px 5px;border:1px solid var(--gray-300);border-radius:3px;text-align:center;font-size:12px;font-family:inherit}
+.mini-table .auto{color:var(--gray-500);font-weight:500}
 
-    .cover-subtitle {
-      font-size: 18px;
-      font-weight: 400;
-      color: var(--text-secondary);
-      margin-bottom: 64px;
-    }
+/* KPI cards */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;text-align:center;border:1px solid var(--gray-200);border-top:3px solid var(--navy)}
+.kpi .label{font-size:11px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.kpi .value{font-size:28px;font-weight:800;margin:6px 0 2px;letter-spacing:-.5px}
+.kpi .sub-val{font-size:11px;color:var(--gray-400)}
+.kpi.positive .value{color:var(--green)}
+.kpi.positive{border-top-color:var(--green)}
+.kpi.negative .value{color:var(--red)}
+.kpi.negative{border-top-color:var(--red)}
 
-    .cover-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+/* Result tables */
+.result-section{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px;border:1px solid var(--gray-200)}
+.result-section h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.rtable{width:100%;border-collapse:collapse;font-size:13px}
+.rtable th{background:var(--th-bg);padding:8px 12px;text-align:left;font-weight:600;border:1px solid var(--gray-200);white-space:nowrap}
+.rtable td{padding:8px 12px;border:1px solid var(--gray-200)}
+.rtable .num{text-align:right;font-variant-numeric:tabular-nums}
+.rtable .bold{font-weight:700}
+.rtable .total-row{background:var(--gray-50);font-weight:700}
+.rtable .profit-row{background:#f0fdf4;font-weight:700}
+.rtable .loss-row{background:#fef2f2;font-weight:700}
+.rtable .section-header{background:var(--navy);color:var(--white);font-weight:600}
+.rtable .sub-header{background:#f8f9fa;font-weight:600}
 
-    .cover-meta span {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
+/* Bar chart CSS */
+.bar-chart{margin-top:12px}
+.bar-row{display:flex;align-items:center;margin-bottom:6px;font-size:12px}
+.bar-label{width:100px;font-weight:500;flex-shrink:0}
+.bar-track{flex:1;height:22px;background:var(--gray-100);border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:4px;transition:width .3s;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:600;color:var(--white);min-width:fit-content}
+.bar-pct{width:50px;text-align:right;font-weight:600;flex-shrink:0;margin-left:8px}
 
-    .cover-meta strong {
-      color: var(--navy);
-    }
+/* Tab 2 specific */
+.invest-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+.invest-item{background:var(--gray-50);border-radius:6px;padding:12px;text-align:center;border:1px solid var(--gray-200)}
+.invest-item .il{font-size:11px;color:var(--gray-500);font-weight:600}
+.invest-item .iv{font-size:20px;font-weight:800;color:var(--navy);margin-top:4px}
+.invest-item.total{background:var(--navy);color:var(--white)}
+.invest-item.total .il{color:rgba(255,255,255,.7)}
+.invest-item.total .iv{color:var(--white)}
 
-    /* ─── SECTION ─── */
-    .section {
-      background: #fff;
-      margin: 24px auto;
-      max-width: 900px;
-      padding: 48px var(--page-pad);
-      border-radius: 2px;
-    }
+/* Cumulative chart */
+.cum-chart{display:flex;align-items:end;gap:2px;height:200px;padding:20px 0;border-bottom:2px solid var(--gray-300);margin-bottom:8px}
+.cum-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:end;position:relative}
+.cum-bar .bar-up{background:var(--green);border-radius:3px 3px 0 0;width:80%;min-height:0;transition:height .3s}
+.cum-bar .bar-down{background:var(--red);border-radius:0 0 3px 3px;width:80%;min-height:0;transition:height .3s}
+.cum-bar .bar-lbl{font-size:9px;color:var(--gray-500);margin-top:4px}
+.cum-bar .bar-val{font-size:9px;font-weight:600;position:absolute;top:-14px;white-space:nowrap}
 
-    .section-header {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--navy);
-      border-left: 4px solid var(--navy);
-      padding-left: 14px;
-      margin-bottom: 28px;
-      line-height: 1.4;
-    }
+/* Tab 4 comparison */
+.compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.compare-col{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--gray-200)}
+.compare-col h4{text-align:center;font-size:14px;margin-bottom:12px;padding:8px;border-radius:6px}
+.compare-col.worst h4{background:#fef2f2;color:var(--red)}
+.compare-col.normal h4{background:#eff6ff;color:var(--blue)}
+.compare-col.best h4{background:#f0fdf4;color:var(--green)}
+.compare-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-100);font-size:13px}
+.compare-item:last-child{border:none}
+.compare-item .ci-label{color:var(--gray-600)}
+.compare-item .ci-value{font-weight:700}
 
-    .section-num {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      letter-spacing: 1px;
-      display: block;
-      margin-bottom: 4px;
-    }
+/* Tab 5 formulas */
+.formula-block{background:var(--gray-50);border-radius:var(--radius);padding:20px;margin-bottom:12px;border:1px solid var(--gray-200);font-family:'Pretendard',monospace}
+.formula-block h4{font-size:14px;color:var(--navy);margin-bottom:10px}
+.formula{font-size:13px;line-height:2;color:var(--navy-light)}
+.formula .var{color:var(--blue);font-weight:600}
+.formula .op{color:var(--gray-500)}
+.formula .comment{color:var(--gray-400);font-style:italic}
 
-    /* ─── PROSE ─── */
-    .prose p {
-      color: var(--text-secondary);
-      margin-bottom: 10px;
-    }
+/* Matrix table */
+.matrix{width:100%;border-collapse:collapse;font-size:12px}
+.matrix th,.matrix td{padding:8px 10px;border:1px solid var(--gray-200);text-align:center}
+.matrix th{background:var(--th-bg);font-weight:600}
+.matrix .pos{color:var(--green);font-weight:600}
+.matrix .neg{color:var(--red);font-weight:600}
 
-    .prose ul {
-      padding-left: 20px;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-    }
-
-    .prose ul li {
-      margin-bottom: 6px;
-    }
-
-    .prose strong {
-      color: var(--navy);
-    }
-
-    /* ─── TABLE ─── */
-    .table-wrap {
-      overflow-x: auto;
-      margin-top: 16px;
-      margin-bottom: 24px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px;
-      word-break: keep-all;
-    }
-
-    table th {
-      background: var(--th-bg);
-      color: var(--navy);
-      font-weight: 600;
-      text-align: left;
-      padding: 10px 14px;
-      border: 1px solid var(--border);
-    }
-
-    table td {
-      background: #fff;
-      color: var(--text);
-      padding: 9px 14px;
-      border: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    table tr:hover td {
-      background: #f8f9fa;
-    }
-
-    .td-num { text-align: right; font-variant-numeric: tabular-nums; }
-    .td-center { text-align: center; }
-
-    /* ─── CALLOUT ─── */
-    .callout {
-      background: #f0f4f8;
-      border-left: 3px solid var(--navy);
-      padding: 14px 18px;
-      border-radius: 0 4px 4px 0;
-      margin: 16px 0;
-      font-size: 13.5px;
-      color: var(--text-secondary);
-    }
-
-    .callout strong {
-      color: var(--navy);
-    }
-
-    /* ─── SUB HEADER ─── */
-    .sub-header {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--navy);
-      margin: 28px 0 12px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    /* ─── PRINT ─── */
-    @media print {
-      @page {
-        size: A4;
-        margin: 15mm 14mm;
-      }
-
-      body {
-        background: #fff;
-        font-size: 12px;
-      }
-
-      .cover {
-        min-height: auto;
-        padding: 60px 28px;
-        page-break-after: always;
-      }
-
-      .section {
-        max-width: 100%;
-        margin: 0;
-        padding: 36px 28px;
-        border-radius: 0;
-        page-break-inside: avoid;
-      }
-
-      table {
-        page-break-inside: avoid;
-      }
-
-      .callout {
-        page-break-inside: avoid;
-      }
-    }
-  </style>
+/* Responsive */
+@media(max-width:768px){
+  .cards{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .compare-grid{grid-template-columns:1fr}
+  .tabs{flex-wrap:wrap}
+  .tab-btn{font-size:11px;padding:8px 4px}
+}
+</style>
 </head>
 <body>
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>WPS × SPC 재무 시뮬레이션</h1>
+      <div class="sub">아파트 단지 무인 커피 사업 수익성 분석 도구</div>
+    </div>
+    <div class="badge">v2.0 · 2026</div>
+  </div>
 
-<!-- ─── 표지 ─── -->
-<div class="cover">
-  <div class="cover-label">Internal Document · Confidential</div>
-  <div class="cover-title">WPS SPC<br>재무 시뮬레이션</div>
-  <div class="cover-subtitle">아파트 단지별 손익 분석 및 스케일업 전망</div>
-  <div class="cover-meta">
-    <span><strong>작성자</strong>&nbsp;&nbsp;성현우 국장</span>
-    <span><strong>작성일</strong>&nbsp;&nbsp;2026.04</span>
-    <span><strong>버전</strong>&nbsp;&nbsp;v5.4</span>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(0)">📊 단지 손익 분석</button>
+    <button class="tab-btn" onclick="switchTab(1)">💰 투자 회수 분석</button>
+    <button class="tab-btn" onclick="switchTab(2)">🏗️ 멀티 단지 스케일업</button>
+    <button class="tab-btn" onclick="switchTab(3)">⚖️ 시나리오 비교</button>
+    <button class="tab-btn" onclick="switchTab(4)">📐 수식 설명</button>
+  </div>
+
+  <!-- TAB 1: 단지 손익 분석 -->
+  <div class="tab-content active" id="tab0">
+    <div class="cards">
+      <!-- Card 1: 단지 기본 -->
+      <div class="card">
+        <h3><span class="icon">🏢</span> 단지 기본</h3>
+        <div class="field">
+          <label>세대 수</label>
+          <input type="number" id="units" value="3000" min="100" max="15000" step="100" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>시나리오</label>
+          <select id="scenario" onchange="onScenarioChange()">
+            <option value="worst">Worst (2.0잔/월)</option>
+            <option value="normal" selected>Normal (3.5잔/월)</option>
+            <option value="best">Best (5.0잔/월)</option>
+            <option value="custom">커스텀</option>
+          </select>
+        </div>
+        <div class="field" id="customCupsField" style="display:none">
+          <label>세대당 잔수/월</label>
+          <input type="number" id="customCups" value="3.5" min="0" max="30" step="0.1" oninput="recalc()">
+        </div>
+        <div class="field">
+          <div class="unit">적용 세대당 잔수: <span class="computed" id="dispCups">3.5</span> 잔/월</div>
+        </div>
+      </div>
+
+      <!-- Card 2: 음료 가격 -->
+      <div class="card" style="grid-column:span 2">
+        <h3><span class="icon">☕</span> 음료 가격</h3>
+        <div class="field">
+          <label>아이스 아메리카노 기준가 (원)</label>
+          <input type="number" id="basePrice" value="3300" min="1000" max="10000" step="100" oninput="recalc()">
+        </div>
+        <table class="mini-table" id="menuTable">
+          <thead><tr><th>메뉴</th><th>가격 비율(%)</th><th>가격(원)</th><th>판매비율(%)</th></tr></thead>
+          <tbody></tbody>
+          <tfoot>
+            <tr><td colspan="2" style="text-align:right;font-weight:700">가중 평균 판매가</td><td class="auto bold" id="avgPrice">-</td><td id="totalRatio" class="bold">-</td></tr>
+          </tfoot>
+        </table>
+        <div class="warn" id="ratioWarn" style="display:none">⚠️ 판매비율 합계가 100%가 아닙니다!</div>
+      </div>
+
+      <!-- Card 3: 설비 -->
+      <div class="card">
+        <h3><span class="icon">⚙️</span> 설비</h3>
+        <div class="field">
+          <label>머신 유형</label>
+          <select id="machineType" onchange="onMachineTypeChange()">
+            <option value="1900">에스프레소 전용 (1,900만)</option>
+            <option value="2800" selected>우유스팀 포함 (2,800만)</option>
+            <option value="custom">커스텀</option>
+          </select>
+        </div>
+        <div class="field" id="customMachinePriceField" style="display:none">
+          <label>머신 대당 가격 (만원)</label>
+          <input type="number" id="customMachinePrice" value="2800" min="0" max="50000" step="100" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>머신 대수</label>
+          <input type="number" id="machineCount" value="1" min="0" max="10" step="1" oninput="recalc()">
+        </div>
+        <div class="inline">
+          <div class="field">
+            <label>감가상각 (년)</label>
+            <input type="number" id="deprYears" value="5" min="1" max="20" step="1" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label>잔존가치 (%)</label>
+            <input type="number" id="residual" value="20" min="0" max="100" step="5" oninput="recalc()">
+          </div>
+        </div>
+        <div class="field">
+          <div class="unit">머신 투자: <span class="computed" id="dispMachineInvest">2,800</span> 만원</div>
+        </div>
+      </div>
+
+      <!-- Card 4: 인건비 -->
+      <div class="card">
+        <h3><span class="icon">👷</span> 인건비</h3>
+        <div class="inline">
+          <div class="field">
+            <label>운영 시작</label>
+            <input type="time" id="opStart" value="07:00" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label>운영 종료</label>
+            <input type="time" id="opEnd" value="16:00" oninput="recalc()">
+          </div>
+        </div>
+        <div class="field">
+          <div class="unit">일 운영시간: <span class="computed" id="dispOpHours">9</span> 시간</div>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="weekendOp" checked onchange="recalc()">
+          <label for="weekendOp">주말 운영 (주 7일)</label>
+        </div>
+        <div class="field">
+          <div class="unit">월 운영일수: <span class="computed" id="dispOpDays">30</span> 일</div>
+        </div>
+        <div class="inline">
+          <div class="field">
+            <label>정규직 (명)</label>
+            <input type="number" id="fullCount" value="2" min="0" max="10" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label>월급 (만원)</label>
+            <input type="number" id="fullSalary" value="250" min="0" max="1000" step="10" oninput="recalc()">
+          </div>
+        </div>
+        <div class="inline">
+          <div class="field">
+            <label>파트타임 (명)</label>
+            <input type="number" id="partCount" value="2" min="0" max="10" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label>월급 (만원)</label>
+            <input type="number" id="partSalary" value="158" min="0" max="1000" step="10" oninput="recalc()">
+          </div>
+        </div>
+        <div class="field">
+          <div class="unit">총 인건비: <span class="computed" id="dispLabor">816</span> 만원/월</div>
+        </div>
+      </div>
+
+      <!-- Card 5: 쿠폰·원가 -->
+      <div class="card">
+        <h3><span class="icon">🎫</span> 쿠폰 · 원가</h3>
+        <div class="inline">
+          <div class="field">
+            <label>세대당 쿠폰 (장)</label>
+            <input type="number" id="couponCount" value="3" min="0" max="30" step="1" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label>쿠폰 가격 (원)</label>
+            <input type="number" id="couponPrice" value="2500" min="0" max="10000" step="100" oninput="recalc()">
+          </div>
+        </div>
+        <div class="field">
+          <label>쿠폰 소비율 (%)</label>
+          <input type="number" id="couponRate" value="70" min="0" max="100" step="5" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>잔당 원가 (원)</label>
+          <input type="number" id="cupCost" value="2166" min="0" max="10000" step="1" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>운영비율 (%)</label>
+          <input type="number" id="opCostRate" value="2" min="0" max="50" step="0.5" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>SPC 수수료율 (%)</label>
+          <input type="number" id="spcRate" value="15" min="0" max="50" step="1" oninput="recalc()">
+        </div>
+      </div>
+    </div>
+
+    <!-- 권장 기준 안내 -->
+    <div id="recBox" style="display:none;background:#f0f4f8;border:1px solid #c8d6e5;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:13px;color:#1a2a3a;line-height:1.7"></div>
+<!-- KPI Cards -->
+    <div class="kpis">
+      <div class="kpi" id="kpiDaily"><div class="label">일 판매량</div><div class="value" id="kpiDailyVal">-</div><div class="sub-val">잔</div></div>
+      <div class="kpi" id="kpiRevenue"><div class="label">월 매출</div><div class="value" id="kpiRevenueVal">-</div><div class="sub-val">만원</div></div>
+      <div class="kpi" id="kpiCost"><div class="label">월 비용</div><div class="value" id="kpiCostVal">-</div><div class="sub-val">만원</div></div>
+      <div class="kpi" id="kpiProfit"><div class="label">월 순수익</div><div class="value" id="kpiProfitVal">-</div><div class="sub-val">만원</div></div>
+    </div>
+
+    <!-- 상세 손익표 -->
+    <div class="result-section">
+      <h3>📋 상세 손익표</h3>
+      <table class="rtable" id="plTable"></table>
+    </div>
+
+    <!-- 비율 분석 -->
+    <div class="result-section">
+      <h3>📊 비용 구조 분석</h3>
+      <div class="bar-chart" id="costBars"></div>
+    </div>
+  </div>
+
+  <!-- TAB 2: 투자 회수 분석 -->
+  <div class="tab-content" id="tab1">
+    <div class="cards">
+      <div class="card">
+        <h3><span class="icon">🏗️</span> 초기 투자 비용</h3>
+        <div class="field">
+          <label>인테리어 비용 (만원)</label>
+          <input type="number" id="interiorCost" value="3000" min="0" max="100000" step="100" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>초기 운영자금 (만원)</label>
+          <input type="number" id="initOpFund" value="1000" min="0" max="100000" step="100" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>기타 초기비용 (만원)</label>
+          <input type="number" id="etcCost" value="0" min="0" max="100000" step="100" oninput="recalc()">
+        </div>
+      </div>
+    </div>
+    <div class="invest-summary" id="investSummary"></div>
+    <div class="result-section">
+      <h3>📋 투자 회수 분석</h3>
+      <table class="rtable" id="roiTable"></table>
+    </div>
+    <div class="result-section">
+      <h3>📈 월별 누적 손익</h3>
+      <div class="cum-chart" id="cumChart"></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gray-400);padding:0 4px">
+        <span>투자 시점</span><span id="cumLabel">→ BEP</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: 멀티 단지 스케일업 -->
+  <div class="tab-content" id="tab2">
+    <div class="cards">
+      <div class="card">
+        <h3><span class="icon">🏗️</span> 스케일업 설정</h3>
+        <div class="field">
+          <label>최대 단지 수</label>
+          <input type="number" id="maxComplexes" value="50" min="1" max="200" step="1" oninput="recalc()">
+        </div>
+        <div class="field">
+          <label>수수료 전환점 (단지 수)</label>
+          <input type="number" id="feeThreshold" value="10" min="1" max="200" step="1" oninput="recalc()">
+        </div>
+        <div class="inline">
+          <div class="field">
+            <label>파일럿 수수료 (%)</label>
+            <input type="number" id="pilotFee" value="15" min="0" max="50" step="1" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label>확장 수수료 (%)</label>
+            <input type="number" id="expandFee" value="20" min="0" max="50" step="1" oninput="recalc()">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="result-section">
+      <h3>📋 멀티 단지 스케일업 분석</h3>
+      <table class="rtable" id="scaleTable"></table>
+    </div>
+  </div>
+
+  <!-- TAB 4: 시나리오 비교 -->
+  <div class="tab-content" id="tab3">
+    <div class="result-section">
+      <h3>⚖️ 시나리오 비교 (현재 세대 수 기준)</h3>
+      <div class="compare-grid" id="compareGrid"></div>
+    </div>
+    <div class="result-section">
+      <h3>📊 세대 수 × 시나리오 매트릭스 (월 순수익, 만원)</h3>
+      <table class="matrix" id="matrixTable"></table>
+    </div>
+  </div>
+
+  <!-- TAB 5: 수식 설명 -->
+  <div class="tab-content" id="tab4">
+    <div class="result-section">
+      <h3>📐 수식 정의</h3>
+
+      <div class="formula-block">
+        <h4>1. 판매량 산출</h4>
+        <div class="formula">
+          <span class="var">Q_daily</span> <span class="op">=</span> 세대수 <span class="op">×</span> (세대당잔수 <span class="op">÷</span> 30)<br>
+          <span class="var">Q_monthly</span> <span class="op">=</span> Q_daily <span class="op">×</span> 운영일수<br>
+          <span class="var">Q_coupon</span> <span class="op">=</span> MIN(세대수 <span class="op">×</span> 쿠폰매수 <span class="op">×</span> 소비율, Q_monthly)<br>
+          <span class="var">Q_cash</span> <span class="op">=</span> MAX(Q_monthly <span class="op">−</span> Q_coupon, 0)
+        </div>
+      </div>
+
+      <div class="formula-block">
+        <h4>2. 매출 산출</h4>
+        <div class="formula">
+          <span class="var">Revenue_coupon</span> <span class="op">=</span> 세대수 <span class="op">×</span> 쿠폰매수 <span class="op">×</span> 쿠폰가격<br>
+          <span class="comment">※ 쿠폰 수입은 판매 여부와 무관하게 세대에 배포한 쿠폰 전체 금액 (선결제)</span><br>
+          <span class="var">Revenue_cash</span> <span class="op">=</span> Q_cash <span class="op">×</span> 가중평균판매가<br>
+          <span class="var">Revenue_total</span> <span class="op">=</span> Revenue_coupon <span class="op">+</span> Revenue_cash
+        </div>
+      </div>
+
+      <div class="formula-block">
+        <h4>3. 비용 산출</h4>
+        <div class="formula">
+          <span class="var">Cost_material</span> <span class="op">=</span> Q_monthly <span class="op">×</span> 잔당원가<br>
+          <span class="var">Cost_labor</span> <span class="op">=</span> Σ(인원<sub>i</sub> <span class="op">×</span> 월급<sub>i</sub>)<br>
+          <span class="var">Cost_operation</span> <span class="op">=</span> Revenue_total <span class="op">×</span> 운영비율<br>
+          <span class="var">Cost_SPC</span> <span class="op">=</span> Revenue_total <span class="op">×</span> SPC수수료율<br>
+          <span class="var">Cost_depreciation</span> <span class="op">=</span> 머신대수 <span class="op">×</span> 머신가격 <span class="op">×</span> (1 <span class="op">−</span> 잔존율) <span class="op">÷</span> (감가기간 <span class="op">×</span> 12)<br>
+          <span class="var">Cost_total</span> <span class="op">=</span> Cost_material <span class="op">+</span> Cost_labor <span class="op">+</span> Cost_operation <span class="op">+</span> Cost_SPC <span class="op">+</span> Cost_depreciation
+        </div>
+      </div>
+
+      <div class="formula-block">
+        <h4>4. 손익 및 투자 회수</h4>
+        <div class="formula">
+          <span class="var">Profit</span> <span class="op">=</span> Revenue_total <span class="op">−</span> Cost_total<br>
+          <span class="var">ROI_months</span> <span class="op">=</span> Total_Investment <span class="op">÷</span> MAX(Profit, 0)<br>
+          <span class="comment">※ Profit ≤ 0 인 경우 "회수 불가"</span>
+        </div>
+      </div>
+
+      <div class="formula-block">
+        <h4>5. 변수 기본값</h4>
+        <div class="formula">
+          세대 수 = 3,000 | 시나리오 Normal = 3.5잔/월<br>
+          기준가(아이스 아메리카노) = 3,300원<br>
+          머신: 우유스팀 포함 2,800만원 × 1대<br>
+          감가상각 5년, 잔존가치 20%<br>
+          운영: 07:00~16:00, 주7일(30일/월)<br>
+          정규직 2명 × 250만 + 파트타임 2명 × 158만<br>
+          쿠폰 3장 × 2,500원, 소비율 70%<br>
+          잔당 원가 2,166원, 운영비율 2%, SPC 수수료 15%
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ─── 1. 사업 개요 ─── -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-num">SECTION 01</span>
-    사업 개요
-  </div>
-  <div class="prose">
-    <p><strong>WPS(We Proudly Serve)</strong>는 스타벅스 라이센스 커피 프로그램으로, 아파트 단지 커뮤니티 시설에 스타벅스 에스프레소 셀프서브 스테이션을 도입하는 사업이다.</p>
-    <p>SPC가 설비 투자 및 운영을 전담하고, 단지는 매출 기반 수수료를 수취하는 구조다.</p>
-    <ul>
-      <li><strong>파트너사:</strong> 아파트너 + 법무법인 더 에이치 황해 (또는 SPC 단독 운영)</li>
-      <li><strong>설비 공급:</strong> 오진양행 — 네슬레 공식 유통사, 에스프레소 머신 공급</li>
-      <li><strong>수익 구조:</strong> 판매 매출에서 SPC 수수료(파일럿 15%, 이후 20%)를 단지에 지급</li>
-    </ul>
-  </div>
-</div>
+<script>
+// Menu data
+const defaultMenus = [
+  {name:'아이스 아메리카노', ratio:100, salesRatio:40},
+  {name:'핫 아메리카노', ratio:94, salesRatio:15},
+  {name:'카페라떼', ratio:115, salesRatio:20},
+  {name:'바닐라라떼', ratio:121, salesRatio:10},
+  {name:'카푸치노', ratio:112, salesRatio:5},
+  {name:'초코라떼', ratio:118, salesRatio:5},
+  {name:'기타', ratio:100, salesRatio:5}
+];
 
-<!-- ─── 2. 단가·원가 구조 ─── -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-num">SECTION 02</span>
-    단가 및 원가 구조
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:40%">항목</th>
-          <th class="td-num" style="width:25%">금액</th>
-          <th style="width:35%">비고</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>잔당 원가 (원재료 + 인건비)</td>
-          <td class="td-num">2,166원</td>
-          <td>더테라스 원가 시트 기준</td>
-        </tr>
-        <tr>
-          <td>믹스 평균 판매가</td>
-          <td class="td-num">3,440원</td>
-          <td>타 단지 실제 가격 기준 (+100원)</td>
-        </tr>
-        <tr>
-          <td>쿠폰 가격</td>
-          <td class="td-num">2,500원</td>
-          <td>아메리카노 3,300원 대비 24% 할인</td>
-        </tr>
-        <tr>
-          <td><strong>현금 잔당 마진</strong></td>
-          <td class="td-num"><strong>1,274원</strong></td>
-          <td>마진율 37.0%</td>
-        </tr>
-        <tr>
-          <td><strong>쿠폰 잔당 마진</strong></td>
-          <td class="td-num"><strong>334원</strong></td>
-          <td>마진율 13.4%</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="callout">
-    <strong>쿠폰 구조 주의사항:</strong> 쿠폰 소비율이 높을수록 잔당 마진이 급감한다. 헬리오시티 실측에서 쿠폰 소비율 70%가 수익성 악화의 주요 원인으로 확인됐다.
-  </div>
-</div>
+function initMenuTable(){
+  const tbody = document.querySelector('#menuTable tbody');
+  tbody.innerHTML = '';
+  defaultMenus.forEach((m,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="text-align:left;font-weight:500">${m.name}</td>
+      <td><input type="number" class="menu-ratio" data-i="${i}" value="${m.ratio}" min="1" max="500" step="1" oninput="recalc()"></td>
+      <td class="auto menu-price" data-i="${i}">-</td>
+      <td><input type="number" class="menu-sales" data-i="${i}" value="${m.salesRatio}" min="0" max="100" step="1" oninput="recalc()"></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
 
-<!-- ─── 3. 설비 투자 및 감가상각 ─── -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-num">SECTION 03</span>
-    설비 투자 및 감가상각
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:40%">항목</th>
-          <th class="td-num" style="width:25%">금액</th>
-          <th style="width:35%">비고</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>에스프레소 + 우유스팀 머신</td>
-          <td class="td-num">2,800만원 / 대</td>
-          <td>선불 구매, SPC 유형자산</td>
-        </tr>
-        <tr>
-          <td>에스프레소 전용 머신</td>
-          <td class="td-num">1,900만원 / 대</td>
-          <td>선불 구매</td>
-        </tr>
-        <tr>
-          <td>감가상각 (5년, 잔존가치 20%)</td>
-          <td class="td-num">월 40만원 / 대</td>
-          <td>정액법 적용</td>
-        </tr>
-        <tr>
-          <td>머신 2대 필요 기준</td>
-          <td class="td-num">일 200잔 초과</td>
-          <td>대용량 단지 적용</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="callout">
-    <strong>감가상각 산식:</strong> (취득원가 − 잔존가치) ÷ 내용연수 = (3,000만 × 80%) ÷ 5년 = 연 480만원 → 월 40만원
-  </div>
-</div>
+function getMenuData(){
+  const base = num('basePrice');
+  const rows = [];
+  let totalSales = 0;
+  let weightedPrice = 0;
+  document.querySelectorAll('.menu-ratio').forEach((el,i)=>{
+    const ratio = parseFloat(el.value)||0;
+    const salesEl = document.querySelector(`.menu-sales[data-i="${i}"]`);
+    const sales = parseFloat(salesEl.value)||0;
+    const price = Math.round(base * ratio / 100);
+    document.querySelector(`.menu-price[data-i="${i}"]`).textContent = price.toLocaleString('ko-KR');
+    rows.push({ratio, price, sales});
+    totalSales += sales;
+    weightedPrice += price * sales;
+  });
+  const avgPrice = totalSales > 0 ? Math.round(weightedPrice / totalSales) : 0;
+  document.getElementById('avgPrice').textContent = avgPrice.toLocaleString('ko-KR') + '원';
+  document.getElementById('totalRatio').textContent = totalSales + '%';
+  document.getElementById('ratioWarn').style.display = totalSales !== 100 ? 'block' : 'none';
+  return {avgPrice, totalSales, rows};
+}
 
-<!-- ─── 4. 세대 규모별 단지 손익 시뮬레이션 ─── -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-num">SECTION 04</span>
-    세대 규모별 단지 손익 시뮬레이션
-  </div>
+// Helpers
+function num(id){ return parseFloat(document.getElementById(id).value)||0; }
+function fmt(n){ return Math.round(n).toLocaleString('ko-KR'); }
+function fmtM(n){ return Math.round(n).toLocaleString('ko-KR'); } // 만원 단위
+function fmtF(n,d=1){ return n.toFixed(d); }
+function profitClass(v){ return v >= 0 ? 'positive' : 'negative'; }
+function profitColor(v){ return v >= 0 ? 'var(--green)' : 'var(--red)'; }
 
-  <div class="prose">
-    <p><strong>시나리오 전제 조건</strong></p>
-    <ul>
-      <li>세대 가입률: 70%</li>
-      <li>쿠폰 소비율: 70%</li>
-      <li>일 평균 판매 잔수: 세대수 × 0.03 (예: 3,000세대 → 일 90잔)</li>
-      <li>인력 구성: 정규직 1명 + 파트타임 1명 (월 408만원)</li>
-      <li>월 운영비 (원두 등): 100만원</li>
-    </ul>
-  </div>
+function getCupsPerMonth(){
+  const s = document.getElementById('scenario').value;
+  if(s==='worst') return 2.0;
+  if(s==='normal') return 3.5;
+  if(s==='best') return 5.0;
+  return parseFloat(document.getElementById('customCups').value)||0;
+}
 
-  <div class="sub-header">1,000세대 단지</div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:40%">항목</th>
-          <th class="td-num" style="width:30%">Normal</th>
-          <th class="td-num" style="width:30%">Worst</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>월 판매 잔수</td>
-          <td class="td-num">900잔</td>
-          <td class="td-num">600잔</td>
-        </tr>
-        <tr>
-          <td>월 매출 (믹스 3,440원)</td>
-          <td class="td-num">309만원</td>
-          <td class="td-num">206만원</td>
-        </tr>
-        <tr>
-          <td>원가 (잔당 2,166원)</td>
-          <td class="td-num">195만원</td>
-          <td class="td-num">130만원</td>
-        </tr>
-        <tr>
-          <td>인건비</td>
-          <td class="td-num">408만원</td>
-          <td class="td-num">408만원</td>
-        </tr>
-        <tr>
-          <td>운영비</td>
-          <td class="td-num">100만원</td>
-          <td class="td-num">100만원</td>
-        </tr>
-        <tr>
-          <td>감가상각</td>
-          <td class="td-num">40만원</td>
-          <td class="td-num">40만원</td>
-        </tr>
-        <tr>
-          <td><strong>월 수익</strong></td>
-          <td class="td-num" style="color:#c0392b;font-weight:700">-434만원</td>
-          <td class="td-num" style="color:#c0392b;font-weight:700">-472만원</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="callout">
-    <strong>결론:</strong> 1,000세대 규모는 Normal·Worst 모두 적자. 최소 2,000세대 이상 단지를 타깃해야 한다.
-  </div>
+function getMachinePrice(){
+  const t = document.getElementById('machineType').value;
+  if(t==='custom') return num('customMachinePrice');
+  return parseFloat(t);
+}
 
-  <div class="sub-header">2,000세대 단지</div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:40%">항목</th>
-          <th class="td-num" style="width:30%">Normal</th>
-          <th class="td-num" style="width:30%">Worst</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>월 판매 잔수</td>
-          <td class="td-num">1,800잔</td>
-          <td class="td-num">1,200잔</td>
-        </tr>
-        <tr>
-          <td>월 매출</td>
-          <td class="td-num">619만원</td>
-          <td class="td-num">413만원</td>
-        </tr>
-        <tr>
-          <td>원가</td>
-          <td class="td-num">390만원</td>
-          <td class="td-num">260만원</td>
-        </tr>
-        <tr>
-          <td>인건비</td>
-          <td class="td-num">408만원</td>
-          <td class="td-num">408만원</td>
-        </tr>
-        <tr>
-          <td>운영비</td>
-          <td class="td-num">100만원</td>
-          <td class="td-num">100만원</td>
-        </tr>
-        <tr>
-          <td>감가상각</td>
-          <td class="td-num">40만원</td>
-          <td class="td-num">40만원</td>
-        </tr>
-        <tr>
-          <td><strong>월 수익 (참고)</strong></td>
-          <td class="td-num" style="color:#c0392b;font-weight:700">-319만원</td>
-          <td class="td-num" style="color:#c0392b;font-weight:700">-395만원</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+function getOpHours(){
+  const s = document.getElementById('opStart').value||'07:00';
+  const e = document.getElementById('opEnd').value||'16:00';
+  const [sh,sm] = s.split(':').map(Number);
+  const [eh,em] = e.split(':').map(Number);
+  let h = (eh*60+em - sh*60-sm)/60;
+  if(h<0) h+=24;
+  return h;
+}
 
-  <div class="sub-header">확정 수치 기반 시뮬레이션 (v5.4 기준)</div>
-  <div class="callout" style="margin-bottom:16px">
-    쿠폰 구조 및 판매 단가 반영 후 확정 수치. 위 참고치와 차이가 있으며, 아래 수치를 공식 기준으로 사용한다.
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>세대</th>
-          <th>시나리오</th>
-          <th class="td-num">단지 월 수익</th>
-          <th class="td-num">SPC 수수료 (월)</th>
-          <th>비고</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="td-center">2,000</td>
-          <td>Worst</td>
-          <td class="td-num" style="color:#27ae60;font-weight:700">+74만원</td>
-          <td class="td-num">별도</td>
-          <td>흑자 유지 (하한선)</td>
-        </tr>
-        <tr>
-          <td class="td-center">3,000</td>
-          <td>Normal (정규1 + 파트1)</td>
-          <td class="td-num" style="color:#27ae60;font-weight:700">+384만원</td>
-          <td class="td-num">554만원</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td class="td-center">3,000</td>
-          <td>Normal (파트타임 2명)</td>
-          <td class="td-num" style="color:#27ae60;font-weight:700">+476만원</td>
-          <td class="td-num">554만원</td>
-          <td>인건비 절감 효과</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+function getOpDays(){
+  return document.getElementById('weekendOp').checked ? 30 : 22;
+}
 
-<!-- ─── 5. SPC 수익 시뮬레이션 ─── -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-num">SECTION 05</span>
-    SPC 수익 시뮬레이션 (단지 수 확장)
-  </div>
-  <div class="prose">
-    <p>수수료율: 파일럿(10개 단지 이하) <strong>15%</strong>, 이후 <strong>20%</strong></p>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th class="td-center" style="width:15%">단지 수</th>
-          <th class="td-center" style="width:15%">평균 세대</th>
-          <th class="td-num" style="width:20%">SPC 월 수수료</th>
-          <th class="td-num" style="width:20%">SPC 연 수수료</th>
-          <th style="width:30%">비고</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="td-center">3</td>
-          <td class="td-center">3,000</td>
-          <td class="td-num">1,662만원</td>
-          <td class="td-num">2.0억원</td>
-          <td>파일럿 단계 (15%)</td>
-        </tr>
-        <tr>
-          <td class="td-center">5</td>
-          <td class="td-center">3,000</td>
-          <td class="td-num">2,770만원</td>
-          <td class="td-num">3.3억원</td>
-          <td>파일럿 단계</td>
-        </tr>
-        <tr>
-          <td class="td-center">10</td>
-          <td class="td-center">3,000</td>
-          <td class="td-num">5,540만원</td>
-          <td class="td-num">6.6억원</td>
-          <td>20% 수수료 전환</td>
-        </tr>
-        <tr>
-          <td class="td-center">20</td>
-          <td class="td-center">2,500</td>
-          <td class="td-num">9,240만원</td>
-          <td class="td-num">11.1억원</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td class="td-center"><strong>50</strong></td>
-          <td class="td-center"><strong>2,500</strong></td>
-          <td class="td-num"><strong>2.3억원</strong></td>
-          <td class="td-num"><strong>27.7억원</strong></td>
-          <td><strong>목표 단계</strong></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+function onScenarioChange(){
+  const s = document.getElementById('scenario').value;
+  document.getElementById('customCupsField').style.display = s==='custom' ? 'block' : 'none';
+  recalc();
+}
 
-<!-- ─── 6. 초기 투자 및 손익분기 ─── -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-num">SECTION 06</span>
-    초기 투자 및 손익분기
-  </div>
+function onMachineTypeChange(){
+  const t = document.getElementById('machineType').value;
+  document.getElementById('customMachinePriceField').style.display = t==='custom' ? 'block' : 'none';
+  recalc();
+}
 
-  <div class="sub-header">3개 단지 파일럿 초기 투자</div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:60%">항목</th>
-          <th class="td-num" style="width:40%">금액</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>에스프레소 머신 3대 (2,800만원 × 3)</td>
-          <td class="td-num">8,400만원</td>
-        </tr>
-        <tr>
-          <td>인테리어 및 설비 (추정)</td>
-          <td class="td-num">3,000만원</td>
-        </tr>
-        <tr>
-          <td>초기 원두 및 자재</td>
-          <td class="td-num">300만원</td>
-        </tr>
-        <tr>
-          <td>운영 자금 (3개월)</td>
-          <td class="td-num">3,000만원</td>
-        </tr>
-        <tr>
-          <td><strong>합계</strong></td>
-          <td class="td-num"><strong>약 1억 5,000만원</strong></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+// Tab switching
+function switchTab(i){
+  document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.querySelectorAll('.tab-content').forEach((c,j)=>c.classList.toggle('active',j===i));
+  recalc();
+}
 
-  <div class="sub-header">손익분기 분석</div>
-  <div class="prose">
-    <ul>
-      <li><strong>표준 확장형 기준:</strong> 약 12개 단지 운영 시점에서 손익분기 도달</li>
-      <li><strong>파일럿 3개 단지:</strong> SPC 월 수수료 1,662만원 → 연간 약 2.0억원 → 투자 회수 기간 1년 이내</li>
-    </ul>
-  </div>
-</div>
+// Core calculation
+function calcPL(overrides={}){
+  const units = overrides.units ?? num('units');
+  const cupsPerMonth = overrides.cupsPerMonth ?? getCupsPerMonth();
+  const menuData = overrides.menuData ?? getMenuData();
+  const avgPrice = menuData.avgPrice;
+  const machinePrice = overrides.machinePrice ?? getMachinePrice();
+  const machineCount = overrides.machineCount ?? num('machineCount');
+  const deprYears = overrides.deprYears ?? num('deprYears');
+  const residual = overrides.residual ?? num('residual');
+  const opDays = overrides.opDays ?? getOpDays();
+  const fullCount = overrides.fullCount ?? num('fullCount');
+  const fullSalary = overrides.fullSalary ?? num('fullSalary');
+  const partCount = overrides.partCount ?? num('partCount');
+  const partSalary = overrides.partSalary ?? num('partSalary');
+  const couponCount = overrides.couponCount ?? num('couponCount');
+  const couponPrice = overrides.couponPrice ?? num('couponPrice');
+  const couponRate = overrides.couponRate ?? num('couponRate');
+  const cupCost = overrides.cupCost ?? num('cupCost');
+  const opCostRate = overrides.opCostRate ?? num('opCostRate');
+  const spcRate = overrides.spcRate ?? num('spcRate');
 
-<!-- ─── 7. 헬리오시티 실측 vs 개선안 ─── -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-num">SECTION 07</span>
-    헬리오시티 실측 vs 개선안
-  </div>
-  <div class="prose">
-    <p>헬리오시티(9,510세대) 실측 데이터 기반으로 현행 운영 문제점 및 개선안을 제시한다.</p>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:30%">항목</th>
-          <th class="td-num" style="width:30%">현행</th>
-          <th class="td-num" style="width:40%">개선안</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>월 매출</td>
-          <td class="td-num">4,700만원</td>
-          <td class="td-num">4,700만원</td>
-        </tr>
-        <tr>
-          <td>쿠폰 소비율</td>
-          <td class="td-num">70%</td>
-          <td class="td-num">50%로 조정</td>
-        </tr>
-        <tr>
-          <td>인건비 (인력)</td>
-          <td class="td-num">2,750만원 (11명)</td>
-          <td class="td-num">1,500만원 (6명)</td>
-        </tr>
-        <tr>
-          <td>쿠폰 원가</td>
-          <td class="td-num">1,800원 / 잔</td>
-          <td class="td-num">구조 변경</td>
-        </tr>
-        <tr>
-          <td><strong>월 적자</strong></td>
-          <td class="td-num" style="color:#c0392b;font-weight:700">-3,900만원</td>
-          <td class="td-num" style="color:#e67e22;font-weight:700">-1,800 ~ -2,300만원</td>
-        </tr>
-        <tr>
-          <td><strong>개선 효과</strong></td>
-          <td class="td-num">—</td>
-          <td class="td-num" style="color:#27ae60;font-weight:700">+1,600 ~ +2,000만원</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="callout">
-    <strong>핵심 개선 방향:</strong> (1) 쿠폰 소비율 70% → 50% 조정으로 잔당 마진 회복, (2) 인력 11명 → 6명으로 최적화하여 월 1,250만원 인건비 절감.
-  </div>
-</div>
+  // Quantities
+  const qDaily = units * (cupsPerMonth / 30);
+  const qMonthly = qDaily * opDays;
+  const qCoupon = Math.min(units * couponCount * (couponRate/100), qMonthly);
+  const qCash = Math.max(qMonthly - qCoupon, 0);
 
-<!-- ─── 8. 리스크 및 대응 ─── -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-num">SECTION 08</span>
-    리스크 및 대응 방안
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:45%">리스크</th>
-          <th style="width:55%">대응 방안</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>스타벅스 직영 매장이 있는 단지</td>
-          <td>네슬레 라이센스 승인 어려움 → 타깃 단지에서 사전 제외</td>
-        </tr>
-        <tr>
-          <td>네슬레 라이센스 거부</td>
-          <td>오진양행(네슬레 공식 유통사)을 통한 사전 협의 진행</td>
-        </tr>
-        <tr>
-          <td>관리비 항목 적법성 문제</td>
-          <td>장기수선충당금 및 잡수입 항목 법률 검토 (법무법인 더 에이치 황해)</td>
-        </tr>
-        <tr>
-          <td>인건비 상승</td>
-          <td>파트타임 인력 비중 조정 및 운영 효율화</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+  // Revenue (만원)
+  const revCoupon = (units * couponCount * couponPrice) / 10000;
+  const revCash = (qCash * avgPrice) / 10000;
+  const revTotal = revCoupon + revCash;
 
-<!-- ─── FOOTER ─── -->
-<div style="text-align:center; padding:32px; color:#a0aec0; font-size:12px;">
-  WPS SPC 재무 시뮬레이션 v5.4 &nbsp;·&nbsp; 2026.04 &nbsp;·&nbsp; 성현우 국장 &nbsp;·&nbsp; Confidential
-</div>
+  // Costs (만원)
+  const costMaterial = (qMonthly * cupCost) / 10000;
+  const costLabor = fullCount * fullSalary + partCount * partSalary;
+  const costOp = revTotal * (opCostRate / 100);
+  const costSPC = revTotal * (spcRate / 100);
+  const costDepr = machineCount > 0 ? (machineCount * machinePrice * (1 - residual/100)) / (deprYears * 12) : 0;
+  const costTotal = costMaterial + costLabor + costOp + costSPC + costDepr;
 
+  const profit = revTotal - costTotal;
+  const costRatio = revTotal > 0 ? (costMaterial / revTotal * 100) : 0;
+  const profitMargin = revTotal > 0 ? (profit / revTotal * 100) : 0;
+
+  return {
+    units, cupsPerMonth, avgPrice, machinePrice, machineCount, deprYears, residual, opDays,
+    qDaily, qMonthly, qCoupon, qCash,
+    revCoupon, revCash, revTotal,
+    costMaterial, costLabor, costOp, costSPC, costDepr, costTotal,
+    profit, costRatio, profitMargin,
+    fullCount, fullSalary, partCount, partSalary,
+    couponCount, couponPrice, couponRate, cupCost, opCostRate, spcRate
+  };
+}
+
+function recalc(){
+  
+  // 세대 수 기반 권장 기계·인력 계산
+  const _units = num("units");
+  const _cupsPerMonth = getCupsPerMonth();
+  const _dailyCups = _units * (_cupsPerMonth / 30);
+  let recMachine=1, recFull=1, recPart=0, recNote="";
+  if(_dailyCups<=200){recMachine=1;recFull=1;recPart=0;recNote="일 200잔 이하 → 머신 1대, 정규 1명";}
+  else if(_dailyCups<=400){recMachine=2;recFull=1;recPart=1;recNote="일 200~400잔 → 머신 2대, 정규1+파트1";}
+  else{recMachine=Math.ceil(_dailyCups/200);recFull=2;recPart=2;recNote="일 "+Math.round(_dailyCups)+"잔 → 머신 "+recMachine+"대, 정규2+파트2";}
+  const recEl=document.getElementById("recBox");
+  if(recEl){recEl.innerHTML="<b>권장 기준</b>: "+recNote+" (일 "+Math.round(_dailyCups)+"잔 예상)";
+    recEl.style.display="block";}
+
+  const pl = calcPL();
+
+  // Display helpers
+  document.getElementById('dispCups').textContent = fmtF(getCupsPerMonth());
+  document.getElementById('dispMachineInvest').textContent = fmt(getMachinePrice() * num('machineCount'));
+  document.getElementById('dispOpHours').textContent = fmtF(getOpHours());
+  document.getElementById('dispOpDays').textContent = getOpDays();
+  document.getElementById('dispLabor').textContent = fmt(num('fullCount')*num('fullSalary') + num('partCount')*num('partSalary'));
+
+  // KPIs
+  document.getElementById('kpiDailyVal').textContent = fmt(pl.qDaily);
+  document.getElementById('kpiRevenueVal').textContent = fmt(pl.revTotal);
+  document.getElementById('kpiCostVal').textContent = fmt(pl.costTotal);
+  const profitStr = (pl.profit >= 0 ? '+' : '') + fmt(pl.profit);
+  document.getElementById('kpiProfitVal').textContent = profitStr;
+
+  const kpiProfit = document.getElementById('kpiProfit');
+  kpiProfit.className = 'kpi ' + profitClass(pl.profit);
+
+  // P&L Table
+  renderPLTable(pl);
+
+  // Cost bars
+  renderCostBars(pl);
+
+  // Tab 2
+  renderInvestment(pl);
+
+  // Tab 3
+  renderScale(pl);
+
+  // Tab 4
+  renderComparison();
+}
+
+function renderPLTable(pl){
+  const t = document.getElementById('plTable');
+  const rows = [
+    ['section', '매출'],
+    ['row', '쿠폰 수입', `${fmt(pl.units)}세대 × ${pl.couponCount}장 × ${fmt(pl.couponPrice)}원`, fmtM(pl.revCoupon)],
+    ['row', '현금 수입', `${fmt(pl.qCash)}잔 × ${fmt(pl.avgPrice)}원`, fmtM(pl.revCash)],
+    ['total', '총 매출', '', fmtM(pl.revTotal)],
+    ['section', '비용'],
+    ['row', '재료비', `${fmt(pl.qMonthly)}잔 × ${fmt(pl.cupCost)}원`, fmtM(pl.costMaterial)],
+    ['row', '인건비', `정규 ${pl.fullCount}×${fmt(pl.fullSalary)}만 + 파트 ${pl.partCount}×${fmt(pl.partSalary)}만`, fmtM(pl.costLabor)],
+    ['row', '운영비', `매출 × ${pl.opCostRate}%`, fmtM(pl.costOp)],
+    ['row', 'SPC 수수료', `매출 × ${pl.spcRate}%`, fmtM(pl.costSPC)],
+    ['row', '감가상각', pl.machineCount > 0 ? `${pl.machineCount}대 × ${fmt(pl.machinePrice)}만 × ${100-pl.residual}% ÷ ${pl.deprYears*12}개월` : '머신 없음', fmtM(pl.costDepr)],
+    ['total', '총 비용', '', fmtM(pl.costTotal)],
+    ['profit', '월 순수익', '매출 − 비용', (pl.profit>=0?'+':'')+fmtM(pl.profit)],
+    ['ratio', '원가율', '재료비 ÷ 매출', fmtF(pl.costRatio)+'%'],
+    ['ratio', '영업이익률', '순수익 ÷ 매출', fmtF(pl.profitMargin)+'%'],
+  ];
+
+  let html = '<thead><tr><th style="width:80px">구분</th><th>항목</th><th>계산 근거</th><th style="width:120px" class="num">금액 (만원)</th></tr></thead><tbody>';
+  let currentSection = '';
+  rows.forEach(r=>{
+    if(r[0]==='section'){
+      currentSection = r[1];
+      html += `<tr class="section-header"><td colspan="4">${r[1]}</td></tr>`;
+    } else if(r[0]==='total'){
+      html += `<tr class="total-row"><td>${currentSection}</td><td class="bold">${r[1]}</td><td>${r[2]}</td><td class="num bold">${r[3]}</td></tr>`;
+    } else if(r[0]==='profit'){
+      const cls = pl.profit >= 0 ? 'profit-row' : 'loss-row';
+      html += `<tr class="${cls}"><td>손익</td><td class="bold">${r[1]}</td><td>${r[2]}</td><td class="num bold" style="color:${profitColor(pl.profit)}">${r[3]}</td></tr>`;
+    } else if(r[0]==='ratio'){
+      html += `<tr class="sub-header"><td></td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td></tr>`;
+    } else {
+      html += `<tr><td></td><td>${r[1]}</td><td style="font-size:12px;color:var(--gray-500)">${r[2]}</td><td class="num">${r[3]}</td></tr>`;
+    }
+  });
+  html += '</tbody>';
+  t.innerHTML = html;
+}
+
+function renderCostBars(pl){
+  const container = document.getElementById('costBars');
+  if(pl.costTotal <= 0){ container.innerHTML = '<div style="color:var(--gray-400);font-size:13px">비용 없음</div>'; return; }
+  const items = [
+    {label:'재료비', val:pl.costMaterial, color:'#3b82f6'},
+    {label:'인건비', val:pl.costLabor, color:'#8b5cf6'},
+    {label:'운영비', val:pl.costOp, color:'#f59e0b'},
+    {label:'SPC 수수료', val:pl.costSPC, color:'#ef4444'},
+    {label:'감가상각', val:pl.costDepr, color:'#6b7280'},
+  ];
+  container.innerHTML = items.map(it=>{
+    const pct = (it.val / pl.costTotal * 100);
+    return `<div class="bar-row">
+      <span class="bar-label">${it.label}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(pct,2)}%;background:${it.color}">${pct>10?fmtF(pct)+'%':''}</div></div>
+      <span class="bar-pct">${fmtF(pct)}%</span>
+    </div>`;
+  }).join('');
+}
+
+function renderInvestment(pl){
+  const machineInvest = pl.machineCount * pl.machinePrice;
+  const interior = num('interiorCost');
+  const initOp = num('initOpFund');
+  const etc = num('etcCost');
+  const totalInvest = machineInvest + interior + initOp + etc;
+
+  // Summary cards
+  const summary = document.getElementById('investSummary');
+  const items = [
+    {label:'머신 투자', val:machineInvest},
+    {label:'인테리어', val:interior},
+    {label:'초기 운영자금', val:initOp},
+    {label:'기타', val:etc},
+    {label:'총 초기 투자', val:totalInvest, total:true},
+  ];
+  summary.innerHTML = items.map(it=>`
+    <div class="invest-item${it.total?' total':''}">
+      <div class="il">${it.label}</div>
+      <div class="iv">${fmt(it.val)}<span style="font-size:12px;font-weight:400"> 만원</span></div>
+    </div>
+  `).join('');
+
+  // ROI table
+  const roiTable = document.getElementById('roiTable');
+  const monthlyProfit = pl.profit;
+  const roiMachine = monthlyProfit > 0 ? Math.ceil(machineInvest / monthlyProfit) : null;
+  const roiInterior = monthlyProfit > 0 ? Math.ceil(interior / monthlyProfit) : null;
+  const roiTotal = monthlyProfit > 0 ? Math.ceil(totalInvest / monthlyProfit) : null;
+
+  roiTable.innerHTML = `
+    <thead><tr><th>항목</th><th class="num">투자액 (만원)</th><th class="num">월 순수익 (만원)</th><th class="num">회수 기간</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td>머신</td><td class="num">${fmt(machineInvest)}</td><td class="num" style="color:${profitColor(monthlyProfit)}">${(monthlyProfit>=0?'+':'')+fmt(monthlyProfit)}</td><td class="num">${roiMachine!==null?roiMachine+'개월':'<span style="color:var(--red)">회수 불가</span>'}</td><td>${machineInvest===0?'머신 없음':''}</td></tr>
+      <tr><td>인테리어</td><td class="num">${fmt(interior)}</td><td class="num" style="color:${profitColor(monthlyProfit)}">${(monthlyProfit>=0?'+':'')+fmt(monthlyProfit)}</td><td class="num">${roiInterior!==null?roiInterior+'개월':'<span style="color:var(--red)">회수 불가</span>'}</td><td></td></tr>
+      <tr class="total-row"><td class="bold">전체</td><td class="num bold">${fmt(totalInvest)}</td><td class="num bold" style="color:${profitColor(monthlyProfit)}">${(monthlyProfit>=0?'+':'')+fmt(monthlyProfit)}</td><td class="num bold">${roiTotal!==null?roiTotal+'개월':'<span style="color:var(--red)">회수 불가</span>'}</td><td>${monthlyProfit<=0?'적자 — 회수 불가':roiTotal!==null?`약 ${fmtF(roiTotal/12)}년`:''}</td></tr>
+    </tbody>
+  `;
+
+  // Cumulative chart
+  renderCumChart(totalInvest, monthlyProfit);
+}
+
+function renderCumChart(totalInvest, monthlyProfit){
+  const container = document.getElementById('cumChart');
+  const label = document.getElementById('cumLabel');
+  const months = 36;
+  let maxAbs = totalInvest;
+  const data = [];
+  for(let m=0;m<=months;m++){
+    const pos = -totalInvest + m * monthlyProfit;
+    data.push(pos);
+    if(Math.abs(pos) > maxAbs) maxAbs = Math.abs(pos);
+  }
+  if(maxAbs === 0) maxAbs = 1;
+
+  let bep = null;
+  if(monthlyProfit > 0){
+    bep = Math.ceil(totalInvest / monthlyProfit);
+    label.textContent = `BEP: ${bep}개월 (약 ${fmtF(bep/12)}년)`;
+  } else {
+    label.textContent = monthlyProfit === 0 ? 'BEP: 수익 없음' : 'BEP: 적자 — 회수 불가';
+  }
+
+  container.innerHTML = data.map((v,i)=>{
+    const h = Math.abs(v) / maxAbs * 160;
+    const isPos = v >= 0;
+    const isBep = bep !== null && i === bep;
+    return `<div class="cum-bar">
+      <div class="bar-val" style="color:${isPos?'var(--green)':'var(--red)'}">${i%3===0||isBep?fmt(v):''}</div>
+      ${isPos
+        ? `<div class="bar-up" style="height:${Math.max(h,2)}px;${isBep?'background:var(--blue);':''}"></div>`
+        : `<div class="bar-down" style="height:${Math.max(h,2)}px;${isBep?'background:var(--blue);':''}"></div>`
+      }
+      <div class="bar-lbl">${i%3===0||isBep?i+'월':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderScale(pl){
+  const threshold = num('feeThreshold');
+  const pilotFee = num('pilotFee');
+  const expandFee = num('expandFee');
+  const maxC = num('maxComplexes');
+  const machineInvest = pl.machineCount * pl.machinePrice;
+  const interior = num('interiorCost');
+  const initOp = num('initOpFund');
+  const etc = num('etcCost');
+  const perComplexInvest = machineInvest + interior + initOp + etc;
+
+  // Choose display rows
+  const displayNums = [1,3,5,10,20,50,100].filter(n=>n<=maxC);
+  if(!displayNums.includes(maxC)) displayNums.push(maxC);
+  displayNums.sort((a,b)=>a-b);
+
+  const table = document.getElementById('scaleTable');
+  let html = `<thead><tr><th class="num">단지 수</th><th>적용 수수료</th><th class="num">단지당 월 매출 (만원)</th><th class="num">SPC 월 수수료 (만원)</th><th class="num">SPC 연 수수료 (만원)</th><th class="num">누적 단지 투자 (만원)</th></tr></thead><tbody>`;
+
+  displayNums.forEach(n=>{
+    const fee = n >= threshold ? expandFee : pilotFee;
+    const isTransition = n >= threshold && (n === threshold || displayNums.indexOf(n) === displayNums.findIndex(x=>x>=threshold));
+    const plN = calcPL({spcRate: fee});
+    const spcMonthly = plN.revTotal * (fee/100) * n;
+    const spcYearly = spcMonthly * 12;
+    const cumInvest = perComplexInvest * n;
+    html += `<tr${isTransition?' style="background:#fff7ed"':''}>
+      <td class="num bold">${n}</td>
+      <td>${fee}%${isTransition?' 🔄 전환':''}
+      </td>
+      <td class="num">${fmt(plN.revTotal)}</td>
+      <td class="num">${fmt(spcMonthly)}</td>
+      <td class="num bold">${fmt(spcYearly)}</td>
+      <td class="num">${fmt(cumInvest)}</td>
+    </tr>`;
+  });
+
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function renderComparison(){
+  const units = num('units');
+  const menuData = getMenuData();
+  const scenarios = [
+    {name:'Worst', cups:2.0, cls:'worst'},
+    {name:'Normal', cups:3.5, cls:'normal'},
+    {name:'Best', cups:5.0, cls:'best'},
+  ];
+
+  // Per-scenario cards
+  const grid = document.getElementById('compareGrid');
+  const machineInvest = getMachinePrice() * num('machineCount');
+  const totalInvest = machineInvest + num('interiorCost') + num('initOpFund') + num('etcCost');
+
+  grid.innerHTML = scenarios.map(s=>{
+    const pl = calcPL({cupsPerMonth: s.cups, menuData});
+    const roi = pl.profit > 0 ? Math.ceil(totalInvest / pl.profit) : null;
+    const items = [
+      ['일 판매량', fmt(pl.qDaily) + ' 잔'],
+      ['월 매출', fmt(pl.revTotal) + ' 만원'],
+      ['월 비용', fmt(pl.costTotal) + ' 만원'],
+      ['월 순수익', (pl.profit>=0?'+':'')+fmt(pl.profit) + ' 만원', profitColor(pl.profit)],
+      ['영업이익률', fmtF(pl.profitMargin) + '%', profitColor(pl.profit)],
+      ['투자 회수', roi ? roi + '개월' : '회수 불가', roi ? 'var(--navy)' : 'var(--red)'],
+    ];
+    return `<div class="compare-col ${s.cls}">
+      <h4>${s.name} (${s.cups}잔/월)</h4>
+      ${items.map(it=>`<div class="compare-item"><span class="ci-label">${it[0]}</span><span class="ci-value" style="${it[2]?'color:'+it[2]:''}">${it[1]}</span></div>`).join('')}
+    </div>`;
+  }).join('');
+
+  // Matrix
+  const matrixUnits = [1000,2000,3000,5000];
+  const matrixTable = document.getElementById('matrixTable');
+  let html = '<thead><tr><th>세대 수</th>';
+  scenarios.forEach(s=> html += `<th>${s.name} (${s.cups}잔/월)</th>`);
+  html += '</tr></thead><tbody>';
+
+  matrixUnits.forEach(u=>{
+    html += `<tr><td class="bold">${fmt(u)} 세대</td>`;
+    scenarios.forEach(s=>{
+      const pl = calcPL({units: u, cupsPerMonth: s.cups, menuData});
+      const cls = pl.profit >= 0 ? 'pos' : 'neg';
+      html += `<td class="${cls}">${(pl.profit>=0?'+':'')}${fmt(pl.profit)}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody>';
+  matrixTable.innerHTML = html;
+}
+
+// Init
+initMenuTable();
+recalc();
+</script>
 </body>
 </html>
