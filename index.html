@@ -156,11 +156,11 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab(0)">📊 단지 손익 분석</button>
-    <button class="tab-btn" onclick="switchTab(1)">💰 투자 회수 분석</button>
-    <button class="tab-btn" onclick="switchTab(2)">🏗️ 멀티 단지 스케일업</button>
-    <button class="tab-btn" onclick="switchTab(3)">⚖️ 시나리오 비교</button>
-    <button class="tab-btn" onclick="switchTab(4)">📐 수식 설명</button>
+    <button class="tab-btn active" onclick="switchTab(0)">단지 손익 분석</button>
+    <button class="tab-btn" onclick="switchTab(1)">투자 회수 분석</button>
+    <button class="tab-btn" onclick="switchTab(2)">멀티 단지 스케일업</button>
+    <button class="tab-btn" onclick="switchTab(3)">시나리오 비교</button>
+    <button class="tab-btn" onclick="switchTab(4)">수식 설명</button>
   </div>
 
   <!-- TAB 1: 단지 손익 분석 -->
@@ -168,7 +168,7 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
     <div class="cards">
       <!-- Card 1: 단지 기본 -->
       <div class="card">
-        <h3><span class="icon">🏢</span> 단지 기본</h3>
+        <h3><span class="icon"></span> 단지 기본</h3>
         <div class="field">
           <label>단지명</label>
           <input type="text" id="danjiName" value="" placeholder="예: 헬리오시티" oninput="recalc()" style="font-size:14px;">
@@ -197,7 +197,7 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
 
       <!-- Card 2: 음료 가격 -->
       <div class="card" style="grid-column:span 2">
-        <h3><span class="icon">☕</span> 음료 가격</h3>
+        <h3><span class="icon"></span> 음료 가격</h3>
         <div class="field">
           <label>아이스 아메리카노 기준가 (원)</label>
           <input type="number" id="basePrice" value="3300" min="1000" max="10000" step="100" oninput="recalc()">
@@ -209,12 +209,12 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
             <tr><td colspan="2" style="text-align:right;font-weight:700">가중 평균 판매가</td><td class="auto bold" id="avgPrice">-</td><td id="totalRatio" class="bold">-</td></tr>
           </tfoot>
         </table>
-        <div class="warn" id="ratioWarn" style="display:none">⚠️ 판매비율 합계가 100%가 아닙니다!</div>
+        <div class="warn" id="ratioWarn" style="display:none">판매비율 합계가 100%가 아닙니다!</div>
       </div>
 
       <!-- Card 3: 설비 -->
       <div class="card">
-        <h3><span class="icon">⚙️</span> 설비</h3>
+        <h3><span class="icon"></span> 설비</h3>
         <h4 style="margin-top:4px;font-size:13px;font-weight:600;color:var(--navy-light)">에스프레소 머신</h4>
         <div class="inline">
           <div class="field">
@@ -254,7 +254,7 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
 
       <!-- Card 4: 인건비 -->
       <div class="card">
-        <h3><span class="icon">👷</span> 인건비</h3>
+        <h3><span class="icon"></span> 인건비</h3>
         <div class="field">
           <label>시급 (원)</label>
           <input type="number" id="hourlyWage" value="10300" min="0" max="100000" step="100" oninput="recalc()">
@@ -292,7 +292,7 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
 
       <!-- Card 5: 쿠폰·원가 -->
       <div class="card">
-        <h3><span class="icon">🎫</span> 쿠폰 · 원가</h3>
+        <h3><span class="icon"></span> 쿠폰 · 원가</h3>
         <div class="inline">
           <div class="field">
             <label>세대당 쿠폰 (장)</label>
@@ -336,13 +336,13 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
 
     <!-- 상세 손익표 -->
     <div class="result-section">
-      <h3>📋 상세 손익표</h3>
+      <h3>상세 손익표</h3>
       <table class="rtable" id="plTable"></table>
     </div>
 
     <!-- 비율 분석 -->
     <div class="result-section">
-      <h3>📊 비용 구조 분석</h3>
+      <h3>비용 구조 분석</h3>
       <div class="bar-chart" id="costBars"></div>
     </div>
   </div>
@@ -351,7 +351,7 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
   <div class="tab-content" id="tab1">
     <div class="cards">
       <div class="card">
-        <h3><span class="icon">🏗️</span> 초기 투자 비용</h3>
+        <h3><span class="icon"></span> 초기 투자 비용</h3>
         <div class="field">
           <label>인테리어 비용 (만원)</label>
           <input type="number" id="interiorCost" value="3000" min="0" max="100000" step="100" oninput="recalc()">
@@ -368,11 +368,11 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
     </div>
     <div class="invest-summary" id="investSummary"></div>
     <div class="result-section">
-      <h3>📋 투자 회수 분석</h3>
+      <h3>투자 회수 분석</h3>
       <table class="rtable" id="roiTable"></table>
     </div>
     <div class="result-section">
-      <h3>📈 월별 누적 손익</h3>
+      <h3>월별 누적 손익</h3>
       <div class="cum-chart" id="cumChart"></div>
       <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gray-400);padding:0 4px">
         <span>투자 시점</span><span id="cumLabel">→ BEP</span>
@@ -384,7 +384,7 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
   <div class="tab-content" id="tab2">
     <div class="cards">
       <div class="card">
-        <h3><span class="icon">🏗️</span> 스케일업 설정</h3>
+        <h3><span class="icon"></span> 스케일업 설정</h3>
         <div class="field">
           <label>최대 단지 수</label>
           <input type="number" id="maxComplexes" value="50" min="1" max="200" step="1" oninput="recalc()">
@@ -406,7 +406,7 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
       </div>
     </div>
     <div class="result-section">
-      <h3>📋 멀티 단지 스케일업 분석</h3>
+      <h3>멀티 단지 스케일업 분석</h3>
       <table class="rtable" id="scaleTable"></table>
     </div>
   </div>
@@ -414,11 +414,11 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
   <!-- TAB 4: 시나리오 비교 -->
   <div class="tab-content" id="tab3">
     <div class="result-section">
-      <h3>⚖️ 시나리오 비교 (현재 세대 수 기준)</h3>
+      <h3>시나리오 비교 (현재 세대 수 기준)</h3>
       <div class="compare-grid" id="compareGrid"></div>
     </div>
     <div class="result-section">
-      <h3>📊 세대 수 × 시나리오 매트릭스 (월 순수익, 만원)</h3>
+      <h3>세대 수 × 시나리오 매트릭스 (월 순수익, 만원)</h3>
       <table class="matrix" id="matrixTable"></table>
     </div>
   </div>
@@ -426,7 +426,7 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
   <!-- TAB 5: 수식 설명 -->
   <div class="tab-content" id="tab4">
     <div class="result-section">
-      <h3>📐 수식 정의</h3>
+      <h3>수식 정의</h3>
 
       <div class="formula-block">
         <h4>1. 판매량 산출</h4>
@@ -720,7 +720,7 @@ function recalc(){
   else if(_dailyCups<=400){recMachine=2;recFull=1;recPart=1;recNote="일 200~400잔 → 머신 2대, 정규1+파트1";}
   else{recMachine=Math.ceil(_dailyCups/200);recFull=2;recPart=2;recNote="일 "+Math.round(_dailyCups)+"잔 → 머신 "+recMachine+"대, 정규2+파트2";}
   if(_totalMachineCount > 0 && _dailyCups > _totalMachineCount * 200){
-    recNote += ` ⚠️ 현재 머신 ${_totalMachineCount}대로 일 ${Math.round(_dailyCups)}잔 처리 부족 (대당 200잔 초과)`;
+    recNote += ` 현재 머신 ${_totalMachineCount}대로 일 ${Math.round(_dailyCups)}잔 처리 부족 (대당 200잔 초과)`;
   }
   // 단지명 표시
   const danjiName = document.getElementById("danjiName").value.trim();
@@ -964,7 +964,7 @@ function renderScale(pl){
     const cumInvest = perComplexInvest * n;
     html += `<tr${isTransition?' style="background:#fff7ed"':''}>
       <td class="num bold">${n}</td>
-      <td>${fee}%${isTransition?' 🔄 전환':''}
+      <td>${fee}%${isTransition?' 전환':''}
       </td>
       <td class="num">${fmt(plN.revTotal)}</td>
       <td class="num">${fmt(spcMonthly)}</td>
