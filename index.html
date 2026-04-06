@@ -215,23 +215,29 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
       <!-- Card 3: 설비 -->
       <div class="card">
         <h3><span class="icon">⚙️</span> 설비</h3>
-        <div class="field">
-          <label>머신 유형</label>
-          <select id="machineType" onchange="onMachineTypeChange()">
-            <option value="1900">에스프레소 전용 (1,900만)</option>
-            <option value="2800" selected>우유스팀 포함 (2,800만)</option>
-            <option value="custom">커스텀</option>
-          </select>
-        </div>
-        <div class="field" id="customMachinePriceField" style="display:none">
-          <label>머신 대당 가격 (만원)</label>
-          <input type="number" id="customMachinePrice" value="2800" min="0" max="50000" step="100" oninput="recalc()">
-        </div>
-        <div class="field">
-          <label>머신 대수</label>
-          <input type="number" id="machineCount" value="1" min="0" max="10" step="1" oninput="recalc()">
-        </div>
+        <h4 style="margin-top:4px;font-size:13px;font-weight:600;color:var(--navy-light)">에스프레소 머신</h4>
         <div class="inline">
+          <div class="field">
+            <label>대수</label>
+            <input type="number" id="espressoCount" value="1" min="0" max="10" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label>대당 가격 (만원)</label>
+            <input type="number" id="espressoPrice" value="1900" min="0" max="50000" step="100" oninput="recalc()">
+          </div>
+        </div>
+        <h4 style="margin-top:12px;font-size:13px;font-weight:600;color:var(--navy-light)">우유스팀 머신</h4>
+        <div class="inline">
+          <div class="field">
+            <label>대수</label>
+            <input type="number" id="steamCount" value="0" min="0" max="10" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label>대당 가격 (만원)</label>
+            <input type="number" id="steamPrice" value="2800" min="0" max="50000" step="100" oninput="recalc()">
+          </div>
+        </div>
+        <div class="inline" style="margin-top:12px">
           <div class="field">
             <label>감가상각 (년)</label>
             <input type="number" id="deprYears" value="5" min="1" max="20" step="1" oninput="recalc()">
@@ -242,56 +248,46 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
           </div>
         </div>
         <div class="field">
-          <div class="unit">머신 투자: <span class="computed" id="dispMachineInvest">2,800</span> 만원</div>
+          <div class="unit">머신 투자: <span class="computed" id="dispMachineInvest">1,900</span> 만원</div>
         </div>
       </div>
 
       <!-- Card 4: 인건비 -->
       <div class="card">
         <h3><span class="icon">👷</span> 인건비</h3>
+        <div class="field">
+          <label>시급 (원)</label>
+          <input type="number" id="hourlyWage" value="10300" min="0" max="100000" step="100" oninput="recalc()">
+        </div>
         <div class="inline">
           <div class="field">
-            <label>운영 시작</label>
-            <input type="time" id="opStart" value="07:00" oninput="recalc()">
+            <label>일 근무시간</label>
+            <input type="number" id="dailyHours" value="9" min="1" max="24" step="0.5" oninput="recalc()">
           </div>
           <div class="field">
-            <label>운영 종료</label>
-            <input type="time" id="opEnd" value="16:00" oninput="recalc()">
+            <label>주 근무일</label>
+            <select id="weekDays" onchange="recalc()">
+              <option value="5">주 5일</option>
+              <option value="6">주 6일</option>
+              <option value="7" selected>주 7일</option>
+            </select>
           </div>
-        </div>
-        <div class="field">
-          <div class="unit">일 운영시간: <span class="computed" id="dispOpHours">9</span> 시간</div>
-        </div>
-        <div class="check-row">
-          <input type="checkbox" id="weekendOp" checked onchange="recalc()">
-          <label for="weekendOp">주말 운영 (주 7일)</label>
-        </div>
-        <div class="field">
-          <div class="unit">월 운영일수: <span class="computed" id="dispOpDays">30</span> 일</div>
         </div>
         <div class="inline">
           <div class="field">
             <label>정규직 (명)</label>
-            <input type="number" id="fullCount" value="2" min="0" max="10" oninput="recalc()">
+            <input type="number" id="fullCount" value="1" min="0" max="10" oninput="recalc()">
           </div>
-          <div class="field">
-            <label>월급 (만원)</label>
-            <input type="number" id="fullSalary" value="250" min="0" max="1000" step="10" oninput="recalc()">
-          </div>
-        </div>
-        <div class="inline">
           <div class="field">
             <label>파트타임 (명)</label>
-            <input type="number" id="partCount" value="2" min="0" max="10" oninput="recalc()">
-          </div>
-          <div class="field">
-            <label>월급 (만원)</label>
-            <input type="number" id="partSalary" value="158" min="0" max="1000" step="10" oninput="recalc()">
+            <input type="number" id="partCount" value="1" min="0" max="10" oninput="recalc()">
           </div>
         </div>
         <div class="field">
-          <div class="unit">총 인건비: <span class="computed" id="dispLabor">816</span> 만원/월</div>
+          <label>파트 일 근무시간</label>
+          <input type="number" id="partDailyHours" value="5" min="1" max="24" step="0.5" oninput="recalc()">
         </div>
+        <div id="laborCalcDisplay" style="margin-top:8px;padding:10px;background:#f8f9fa;border-radius:6px;font-size:12px;line-height:1.8"></div>
       </div>
 
       <!-- Card 5: 쿠폰·원가 -->
@@ -456,10 +452,19 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
         <h4>3. 비용 산출</h4>
         <div class="formula">
           <span class="var">Cost_material</span> <span class="op">=</span> Q_monthly <span class="op">×</span> 잔당원가<br>
-          <span class="var">Cost_labor</span> <span class="op">=</span> Σ(인원<sub>i</sub> <span class="op">×</span> 월급<sub>i</sub>)<br>
+          <br>
+          <span class="comment">// 인건비 (시급 기반)</span><br>
+          <span class="var">주당근로시간</span> <span class="op">=</span> 일근무시간 <span class="op">×</span> 주근무일<br>
+          <span class="var">기본시간_월</span> <span class="op">=</span> MIN(주당근로시간, 40) <span class="op">×</span> 4.345<br>
+          <span class="var">연장시간_월</span> <span class="op">=</span> MAX(주당근로시간 <span class="op">−</span> 40, 0) <span class="op">×</span> 4.345<br>
+          <span class="var">정규직_월급</span> <span class="op">=</span> 기본시간_월 <span class="op">×</span> 시급 <span class="op">+</span> 연장시간_월 <span class="op">×</span> 시급 <span class="op">×</span> 1.5<br>
+          <span class="var">파트_월급</span> <span class="op">=</span> MIN(파트주당h, 40) <span class="op">×</span> 4.345 <span class="op">×</span> 시급 <span class="op">+</span> MAX(파트주당h <span class="op">−</span> 40, 0) <span class="op">×</span> 4.345 <span class="op">×</span> 시급 <span class="op">×</span> 1.5<br>
+          <span class="var">Cost_labor</span> <span class="op">=</span> 정규직수 <span class="op">×</span> 정규직_월급 <span class="op">+</span> 파트수 <span class="op">×</span> 파트_월급<br>
+          <br>
           <span class="var">Cost_operation</span> <span class="op">=</span> Revenue_total <span class="op">×</span> 운영비율<br>
           <span class="var">Cost_SPC</span> <span class="op">=</span> Revenue_total <span class="op">×</span> SPC수수료율<br>
-          <span class="var">Cost_depreciation</span> <span class="op">=</span> 머신대수 <span class="op">×</span> 머신가격 <span class="op">×</span> (1 <span class="op">−</span> 잔존율) <span class="op">÷</span> (감가기간 <span class="op">×</span> 12)<br>
+          <span class="var">머신_총투자</span> <span class="op">=</span> 에스프레소대수 <span class="op">×</span> 에스프레소가격 <span class="op">+</span> 스팀대수 <span class="op">×</span> 스팀가격<br>
+          <span class="var">Cost_depreciation</span> <span class="op">=</span> 머신_총투자 <span class="op">×</span> (1 <span class="op">−</span> 잔존율) <span class="op">÷</span> (감가기간 <span class="op">×</span> 12)<br>
           <span class="var">Cost_total</span> <span class="op">=</span> Cost_material <span class="op">+</span> Cost_labor <span class="op">+</span> Cost_operation <span class="op">+</span> Cost_SPC <span class="op">+</span> Cost_depreciation
         </div>
       </div>
@@ -478,10 +483,10 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
         <div class="formula">
           세대 수 = 3,000 | 시나리오 Normal = 3.5잔/월<br>
           기준가(아이스 아메리카노) = 3,300원<br>
-          머신: 우유스팀 포함 2,800만원 × 1대<br>
+          에스프레소 머신: 1,900만원 × 1대 | 우유스팀 머신: 2,800만원 × 0대<br>
           감가상각 5년, 잔존가치 20%<br>
-          운영: 07:00~16:00, 주7일(30일/월)<br>
-          정규직 2명 × 250만 + 파트타임 2명 × 158만<br>
+          시급 10,300원 | 일 근무 9시간 | 주 7일 (월 운영일 ≈ 30일)<br>
+          정규직 1명 + 파트타임 1명 (파트 일 5시간)<br>
           쿠폰 3장 × 2,500원, 소비율 70%<br>
           잔당 원가 2,166원, 운영비율 2%, SPC 수수료 15%
         </div>
@@ -555,35 +560,64 @@ function getCupsPerMonth(){
   return parseFloat(document.getElementById('customCups').value)||0;
 }
 
-function getMachinePrice(){
-  const t = document.getElementById('machineType').value;
-  if(t==='custom') return num('customMachinePrice');
-  return parseFloat(t);
+function getTotalMachineInvest(){
+  const espressoCount = num('espressoCount');
+  const espressoPrice = num('espressoPrice');
+  const steamCount = num('steamCount');
+  const steamPrice = num('steamPrice');
+  return espressoCount * espressoPrice + steamCount * steamPrice;
 }
 
-function getOpHours(){
-  const s = document.getElementById('opStart').value||'07:00';
-  const e = document.getElementById('opEnd').value||'16:00';
-  const [sh,sm] = s.split(':').map(Number);
-  const [eh,em] = e.split(':').map(Number);
-  let h = (eh*60+em - sh*60-sm)/60;
-  if(h<0) h+=24;
-  return h;
+function getTotalMachineCount(){
+  return num('espressoCount') + num('steamCount');
 }
 
 function getOpDays(){
-  return document.getElementById('weekendOp').checked ? 30 : 22;
+  const weekDays = parseInt(document.getElementById('weekDays').value)||7;
+  return Math.round(weekDays * 4.345);
+}
+
+function calcLabor(){
+  const hourly = num('hourlyWage');
+  const dailyH = num('dailyHours');
+  const weekDays = parseInt(document.getElementById('weekDays').value)||7;
+  const fullCount = num('fullCount');
+  const partCount = num('partCount');
+  const partH = num('partDailyHours');
+
+  // 정규직 월급 계산
+  const weeklyHours = dailyH * weekDays;
+  const baseHours = Math.min(weeklyHours, 40);
+  const overtimeHours = Math.max(weeklyHours - 40, 0);
+  const monthlyWeeks = 4.345;
+
+  const fullMonthly = Math.round(
+    (baseHours * monthlyWeeks * hourly) +
+    (overtimeHours * monthlyWeeks * hourly * 1.5)
+  );
+
+  // 파트타임 월급 계산
+  const partWeeklyH = partH * weekDays;
+  const partBaseH = Math.min(partWeeklyH, 40);
+  const partOTH = Math.max(partWeeklyH - 40, 0);
+  const partMonthly = Math.round(
+    (partBaseH * monthlyWeeks * hourly) +
+    (partOTH * monthlyWeeks * hourly * 1.5)
+  );
+
+  const totalLabor = fullCount * fullMonthly + partCount * partMonthly;
+
+  return {
+    fullMonthly, partMonthly, totalLabor,
+    weeklyHours, baseHours, overtimeHours,
+    partWeeklyH, partBaseH, partOTH,
+    fullCount, partCount, weekDays, dailyH, partH, hourly
+  };
 }
 
 function onScenarioChange(){
   const s = document.getElementById('scenario').value;
   document.getElementById('customCupsField').style.display = s==='custom' ? 'block' : 'none';
-  recalc();
-}
-
-function onMachineTypeChange(){
-  const t = document.getElementById('machineType').value;
-  document.getElementById('customMachinePriceField').style.display = t==='custom' ? 'block' : 'none';
   recalc();
 }
 
@@ -600,15 +634,15 @@ function calcPL(overrides={}){
   const cupsPerMonth = overrides.cupsPerMonth ?? getCupsPerMonth();
   const menuData = overrides.menuData ?? getMenuData();
   const avgPrice = menuData.avgPrice;
-  const machinePrice = overrides.machinePrice ?? getMachinePrice();
-  const machineCount = overrides.machineCount ?? num('machineCount');
+  const espressoCount = overrides.espressoCount ?? num('espressoCount');
+  const espressoPrice = overrides.espressoPrice ?? num('espressoPrice');
+  const steamCount = overrides.steamCount ?? num('steamCount');
+  const steamPrice = overrides.steamPrice ?? num('steamPrice');
+  const totalMachineCount = espressoCount + steamCount;
+  const totalMachineInvest = espressoCount * espressoPrice + steamCount * steamPrice;
   const deprYears = overrides.deprYears ?? num('deprYears');
   const residual = overrides.residual ?? num('residual');
   const opDays = overrides.opDays ?? getOpDays();
-  const fullCount = overrides.fullCount ?? num('fullCount');
-  const fullSalary = overrides.fullSalary ?? num('fullSalary');
-  const partCount = overrides.partCount ?? num('partCount');
-  const partSalary = overrides.partSalary ?? num('partSalary');
   const couponCount = overrides.couponCount ?? num('couponCount');
   const couponPrice = overrides.couponPrice ?? num('couponPrice');
   const couponRate = overrides.couponRate ?? num('couponRate');
@@ -629,10 +663,11 @@ function calcPL(overrides={}){
 
   // Costs (만원)
   const costMaterial = (qMonthly * cupCost) / 10000;
-  const costLabor = fullCount * fullSalary + partCount * partSalary;
+  const labor = calcLabor();
+  const costLabor = labor.totalLabor / 10000;
   const costOp = revTotal * (opCostRate / 100);
   const costSPC = revTotal * (spcRate / 100);
-  const costDepr = machineCount > 0 ? (machineCount * machinePrice * (1 - residual/100)) / (deprYears * 12) : 0;
+  const costDepr = totalMachineInvest > 0 ? totalMachineInvest * (1 - residual/100) / (deprYears * 12) : 0;
   const costTotal = costMaterial + costLabor + costOp + costSPC + costDepr;
 
   const profit = revTotal - costTotal;
@@ -640,12 +675,15 @@ function calcPL(overrides={}){
   const profitMargin = revTotal > 0 ? (profit / revTotal * 100) : 0;
 
   return {
-    units, cupsPerMonth, avgPrice, machinePrice, machineCount, deprYears, residual, opDays,
+    units, cupsPerMonth, avgPrice,
+    espressoCount, espressoPrice, steamCount, steamPrice,
+    totalMachineCount, totalMachineInvest,
+    deprYears, residual, opDays,
     qDaily, qMonthly, qCoupon, qCash,
     revCoupon, revCash, revTotal,
     costMaterial, costLabor, costOp, costSPC, costDepr, costTotal,
     profit, costRatio, profitMargin,
-    fullCount, fullSalary, partCount, partSalary,
+    laborDetail: labor,
     couponCount, couponPrice, couponRate, cupCost, opCostRate, spcRate
   };
 }
@@ -655,15 +693,15 @@ function applyRecommendation(){
   const cupsPerMonth = getCupsPerMonth();
   const dailyCups = units * (cupsPerMonth / 30);
   if(dailyCups <= 200){
-    document.getElementById("machineCount").value = 1;
+    document.getElementById("espressoCount").value = 1;
     document.getElementById("fullCount").value = 1;
     document.getElementById("partCount").value = 0;
   } else if(dailyCups <= 400){
-    document.getElementById("machineCount").value = 2;
+    document.getElementById("espressoCount").value = 2;
     document.getElementById("fullCount").value = 1;
     document.getElementById("partCount").value = 1;
   } else {
-    document.getElementById("machineCount").value = Math.ceil(dailyCups/200);
+    document.getElementById("espressoCount").value = Math.ceil(dailyCups/200);
     document.getElementById("fullCount").value = 2;
     document.getElementById("partCount").value = 2;
   }
@@ -676,10 +714,14 @@ function recalc(){
   const _units = num("units");
   const _cupsPerMonth = getCupsPerMonth();
   const _dailyCups = _units * (_cupsPerMonth / 30);
+  const _totalMachineCount = getTotalMachineCount();
   let recMachine=1, recFull=1, recPart=0, recNote="";
   if(_dailyCups<=200){recMachine=1;recFull=1;recPart=0;recNote="일 200잔 이하 → 머신 1대, 정규 1명";}
   else if(_dailyCups<=400){recMachine=2;recFull=1;recPart=1;recNote="일 200~400잔 → 머신 2대, 정규1+파트1";}
   else{recMachine=Math.ceil(_dailyCups/200);recFull=2;recPart=2;recNote="일 "+Math.round(_dailyCups)+"잔 → 머신 "+recMachine+"대, 정규2+파트2";}
+  if(_totalMachineCount > 0 && _dailyCups > _totalMachineCount * 200){
+    recNote += ` ⚠️ 현재 머신 ${_totalMachineCount}대로 일 ${Math.round(_dailyCups)}잔 처리 부족 (대당 200잔 초과)`;
+  }
   // 단지명 표시
   const danjiName = document.getElementById("danjiName").value.trim();
   const danjiHeader = document.getElementById("danjiHeader");
@@ -694,10 +736,25 @@ function recalc(){
 
   // Display helpers
   document.getElementById('dispCups').textContent = fmtF(getCupsPerMonth());
-  document.getElementById('dispMachineInvest').textContent = fmt(getMachinePrice() * num('machineCount'));
-  document.getElementById('dispOpHours').textContent = fmtF(getOpHours());
-  document.getElementById('dispOpDays').textContent = getOpDays();
-  document.getElementById('dispLabor').textContent = fmt(num('fullCount')*num('fullSalary') + num('partCount')*num('partSalary'));
+  document.getElementById('dispMachineInvest').textContent = fmt(getTotalMachineInvest());
+
+  // 인건비 자동 계산 표시
+  const labor = pl.laborDetail;
+  const fullOTLabel = labor.overtimeHours > 0
+    ? `기본 40h + 연장 ${fmtF(labor.overtimeHours)}h×1.5배`
+    : `기본 ${fmtF(labor.baseHours)}h`;
+  const partOTLabel = labor.partOTH > 0
+    ? `기본 ${fmtF(labor.partBaseH)}h + 연장 ${fmtF(labor.partOTH)}h×1.5배`
+    : `기본 ${fmtF(labor.partBaseH)}h`;
+  let laborHtml = '';
+  if(labor.fullCount > 0){
+    laborHtml += `정규직: 주 ${fmtF(labor.weeklyHours)}h (${fullOTLabel}) = 월 ${Math.round(labor.fullMonthly/10000)}만원 × ${labor.fullCount}명<br>`;
+  }
+  if(labor.partCount > 0){
+    laborHtml += `파트타임: 주 ${fmtF(labor.partWeeklyH)}h (${partOTLabel}) = 월 ${Math.round(labor.partMonthly/10000)}만원 × ${labor.partCount}명<br>`;
+  }
+  laborHtml += `<b>총 인건비: ${Math.round(labor.totalLabor/10000)}만원</b>`;
+  document.getElementById('laborCalcDisplay').innerHTML = laborHtml;
 
   // KPIs
   document.getElementById('kpiDailyVal').textContent = fmt(pl.qDaily);
@@ -734,10 +791,10 @@ function renderPLTable(pl){
     ['total', '총 매출', '', fmtM(pl.revTotal)],
     ['section', '비용'],
     ['row', '재료비', `${fmt(pl.qMonthly)}잔 × ${fmt(pl.cupCost)}원`, fmtM(pl.costMaterial)],
-    ['row', '인건비', `정규 ${pl.fullCount}×${fmt(pl.fullSalary)}만 + 파트 ${pl.partCount}×${fmt(pl.partSalary)}만`, fmtM(pl.costLabor)],
+    ['row', '인건비', `정규 ${pl.laborDetail.fullCount}명×${Math.round(pl.laborDetail.fullMonthly/10000)}만 + 파트 ${pl.laborDetail.partCount}명×${Math.round(pl.laborDetail.partMonthly/10000)}만`, fmtM(pl.costLabor)],
     ['row', '운영비', `매출 × ${pl.opCostRate}%`, fmtM(pl.costOp)],
     ['row', 'SPC 수수료', `매출 × ${pl.spcRate}%`, fmtM(pl.costSPC)],
-    ['row', '감가상각', pl.machineCount > 0 ? `${pl.machineCount}대 × ${fmt(pl.machinePrice)}만 × ${100-pl.residual}% ÷ ${pl.deprYears*12}개월` : '머신 없음', fmtM(pl.costDepr)],
+    ['row', '감가상각', pl.totalMachineInvest > 0 ? `총 ${fmt(pl.totalMachineInvest)}만 × ${100-pl.residual}% ÷ ${pl.deprYears*12}개월` : '머신 없음', fmtM(pl.costDepr)],
     ['total', '총 비용', '', fmtM(pl.costTotal)],
     ['profit', '월 순수익', '매출 − 비용', (pl.profit>=0?'+':'')+fmtM(pl.profit)],
     ['ratio', '원가율', '재료비 ÷ 매출', fmtF(pl.costRatio)+'%'],
@@ -786,16 +843,30 @@ function renderCostBars(pl){
 }
 
 function renderInvestment(pl){
-  const machineInvest = pl.machineCount * pl.machinePrice;
+  const espressoInvest = pl.espressoCount * pl.espressoPrice;
+  const steamInvest = pl.steamCount * pl.steamPrice;
+  const machineInvest = pl.totalMachineInvest;
   const interior = num('interiorCost');
   const initOp = num('initOpFund');
   const etc = num('etcCost');
   const totalInvest = machineInvest + interior + initOp + etc;
 
+  // 머신 투자 상세 텍스트
+  let machineDetail = '';
+  if(pl.espressoCount > 0 && pl.steamCount > 0){
+    machineDetail = `에스프레소 ${pl.espressoCount}대×${fmt(pl.espressoPrice)}만 + 스팀 ${pl.steamCount}대×${fmt(pl.steamPrice)}만 = ${fmt(machineInvest)}만`;
+  } else if(pl.espressoCount > 0){
+    machineDetail = `에스프레소 ${pl.espressoCount}대×${fmt(pl.espressoPrice)}만 = ${fmt(machineInvest)}만`;
+  } else if(pl.steamCount > 0){
+    machineDetail = `스팀 ${pl.steamCount}대×${fmt(pl.steamPrice)}만 = ${fmt(machineInvest)}만`;
+  } else {
+    machineDetail = '머신 없음';
+  }
+
   // Summary cards
   const summary = document.getElementById('investSummary');
   const items = [
-    {label:'머신 투자', val:machineInvest},
+    {label:'머신 투자', val:machineInvest, sub:machineDetail},
     {label:'인테리어', val:interior},
     {label:'초기 운영자금', val:initOp},
     {label:'기타', val:etc},
@@ -805,6 +876,7 @@ function renderInvestment(pl){
     <div class="invest-item${it.total?' total':''}">
       <div class="il">${it.label}</div>
       <div class="iv">${fmt(it.val)}<span style="font-size:12px;font-weight:400"> 만원</span></div>
+      ${it.sub ? `<div style="font-size:10px;color:var(--gray-400);margin-top:2px">${it.sub}</div>` : ''}
     </div>
   `).join('');
 
@@ -818,7 +890,7 @@ function renderInvestment(pl){
   roiTable.innerHTML = `
     <thead><tr><th>항목</th><th class="num">투자액 (만원)</th><th class="num">월 순수익 (만원)</th><th class="num">회수 기간</th><th>비고</th></tr></thead>
     <tbody>
-      <tr><td>머신</td><td class="num">${fmt(machineInvest)}</td><td class="num" style="color:${profitColor(monthlyProfit)}">${(monthlyProfit>=0?'+':'')+fmt(monthlyProfit)}</td><td class="num">${roiMachine!==null?roiMachine+'개월':'<span style="color:var(--red)">회수 불가</span>'}</td><td>${machineInvest===0?'머신 없음':''}</td></tr>
+      <tr><td>머신</td><td class="num">${fmt(machineInvest)}</td><td class="num" style="color:${profitColor(monthlyProfit)}">${(monthlyProfit>=0?'+':'')+fmt(monthlyProfit)}</td><td class="num">${roiMachine!==null?roiMachine+'개월':'<span style="color:var(--red)">회수 불가</span>'}</td><td style="font-size:11px;color:var(--gray-500)">${machineDetail}</td></tr>
       <tr><td>인테리어</td><td class="num">${fmt(interior)}</td><td class="num" style="color:${profitColor(monthlyProfit)}">${(monthlyProfit>=0?'+':'')+fmt(monthlyProfit)}</td><td class="num">${roiInterior!==null?roiInterior+'개월':'<span style="color:var(--red)">회수 불가</span>'}</td><td></td></tr>
       <tr class="total-row"><td class="bold">전체</td><td class="num bold">${fmt(totalInvest)}</td><td class="num bold" style="color:${profitColor(monthlyProfit)}">${(monthlyProfit>=0?'+':'')+fmt(monthlyProfit)}</td><td class="num bold">${roiTotal!==null?roiTotal+'개월':'<span style="color:var(--red)">회수 불가</span>'}</td><td>${monthlyProfit<=0?'적자 — 회수 불가':roiTotal!==null?`약 ${fmtF(roiTotal/12)}년`:''}</td></tr>
     </tbody>
@@ -869,7 +941,7 @@ function renderScale(pl){
   const pilotFee = num('pilotFee');
   const expandFee = num('expandFee');
   const maxC = num('maxComplexes');
-  const machineInvest = pl.machineCount * pl.machinePrice;
+  const machineInvest = pl.totalMachineInvest;
   const interior = num('interiorCost');
   const initOp = num('initOpFund');
   const etc = num('etcCost');
@@ -916,7 +988,7 @@ function renderComparison(){
 
   // Per-scenario cards
   const grid = document.getElementById('compareGrid');
-  const machineInvest = getMachinePrice() * num('machineCount');
+  const machineInvest = getTotalMachineInvest();
   const totalInvest = machineInvest + num('interiorCost') + num('initOpFund') + num('etcCost');
 
   grid.innerHTML = scenarios.map(s=>{
