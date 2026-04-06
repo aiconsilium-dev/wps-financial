@@ -322,7 +322,9 @@ body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(
       </div>
     </div>
 
-    <!-- KPI Cards -->
+    <!-- 권장 기준 안내 -->
+    <div id="recBox" style="display:none;background:#f0f4f8;border:1px solid #c8d6e5;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:13px;color:#1a2a3a;line-height:1.7"></div>
+<!-- KPI Cards -->
     <div class="kpis">
       <div class="kpi" id="kpiDaily"><div class="label">일 판매량</div><div class="value" id="kpiDailyVal">-</div><div class="sub-val">잔</div></div>
       <div class="kpi" id="kpiRevenue"><div class="label">월 매출</div><div class="value" id="kpiRevenueVal">-</div><div class="sub-val">만원</div></div>
@@ -643,6 +645,19 @@ function calcPL(overrides={}){
 }
 
 function recalc(){
+  
+  // 세대 수 기반 권장 기계·인력 계산
+  const _units = num("units");
+  const _cupsPerMonth = getCupsPerMonth();
+  const _dailyCups = _units * (_cupsPerMonth / 30);
+  let recMachine=1, recFull=1, recPart=0, recNote="";
+  if(_dailyCups<=200){recMachine=1;recFull=1;recPart=0;recNote="일 200잔 이하 → 머신 1대, 정규 1명";}
+  else if(_dailyCups<=400){recMachine=2;recFull=1;recPart=1;recNote="일 200~400잔 → 머신 2대, 정규1+파트1";}
+  else{recMachine=Math.ceil(_dailyCups/200);recFull=2;recPart=2;recNote="일 "+Math.round(_dailyCups)+"잔 → 머신 "+recMachine+"대, 정규2+파트2";}
+  const recEl=document.getElementById("recBox");
+  if(recEl){recEl.innerHTML="<b>권장 기준</b>: "+recNote+" (일 "+Math.round(_dailyCups)+"잔 예상)";
+    recEl.style.display="block";}
+
   const pl = calcPL();
 
   // Display helpers
