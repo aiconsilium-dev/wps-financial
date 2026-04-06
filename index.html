@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WPS SPC 재무 시뮬레이션</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #1a2a3a;
+      --navy-light: #2c4a6a;
+      --accent: #1a2a3a;
+      --text: #1a2a3a;
+      --text-secondary: #4a5568;
+      --border: #d1d9e0;
+      --th-bg: #e9ecef;
+      --page-pad: 48px;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: #f5f7fa;
+      line-height: 1.7;
+    }
+
+    /* ─── COVER ─── */
+    .cover {
+      background: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 80px var(--page-pad);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cover-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .cover-title {
+      font-size: 38px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+
+    .cover-subtitle {
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-bottom: 64px;
+    }
+
+    .cover-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cover-meta span {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .cover-meta strong {
+      color: var(--navy);
+    }
+
+    /* ─── SECTION ─── */
+    .section {
+      background: #fff;
+      margin: 24px auto;
+      max-width: 900px;
+      padding: 48px var(--page-pad);
+      border-radius: 2px;
+    }
+
+    .section-header {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+      border-left: 4px solid var(--navy);
+      padding-left: 14px;
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+
+    .section-num {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* ─── PROSE ─── */
+    .prose p {
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .prose ul {
+      padding-left: 20px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .prose ul li {
+      margin-bottom: 6px;
+    }
+
+    .prose strong {
+      color: var(--navy);
+    }
+
+    /* ─── TABLE ─── */
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 16px;
+      margin-bottom: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      word-break: keep-all;
+    }
+
+    table th {
+      background: var(--th-bg);
+      color: var(--navy);
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+    }
+
+    table td {
+      background: #fff;
+      color: var(--text);
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    table tr:hover td {
+      background: #f8f9fa;
+    }
+
+    .td-num { text-align: right; font-variant-numeric: tabular-nums; }
+    .td-center { text-align: center; }
+
+    /* ─── CALLOUT ─── */
+    .callout {
+      background: #f0f4f8;
+      border-left: 3px solid var(--navy);
+      padding: 14px 18px;
+      border-radius: 0 4px 4px 0;
+      margin: 16px 0;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+
+    .callout strong {
+      color: var(--navy);
+    }
+
+    /* ─── SUB HEADER ─── */
+    .sub-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ─── PRINT ─── */
+    @media print {
+      @page {
+        size: A4;
+        margin: 15mm 14mm;
+      }
+
+      body {
+        background: #fff;
+        font-size: 12px;
+      }
+
+      .cover {
+        min-height: auto;
+        padding: 60px 28px;
+        page-break-after: always;
+      }
+
+      .section {
+        max-width: 100%;
+        margin: 0;
+        padding: 36px 28px;
+        border-radius: 0;
+        page-break-inside: avoid;
+      }
+
+      table {
+        page-break-inside: avoid;
+      }
+
+      .callout {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── 표지 ─── -->
+<div class="cover">
+  <div class="cover-label">Internal Document · Confidential</div>
+  <div class="cover-title">WPS SPC<br>재무 시뮬레이션</div>
+  <div class="cover-subtitle">아파트 단지별 손익 분석 및 스케일업 전망</div>
+  <div class="cover-meta">
+    <span><strong>작성자</strong>&nbsp;&nbsp;성현우 국장</span>
+    <span><strong>작성일</strong>&nbsp;&nbsp;2026.04</span>
+    <span><strong>버전</strong>&nbsp;&nbsp;v5.4</span>
+  </div>
+</div>
+
+<!-- ─── 1. 사업 개요 ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">SECTION 01</span>
+    사업 개요
+  </div>
+  <div class="prose">
+    <p><strong>WPS(We Proudly Serve)</strong>는 스타벅스 라이센스 커피 프로그램으로, 아파트 단지 커뮤니티 시설에 스타벅스 에스프레소 셀프서브 스테이션을 도입하는 사업이다.</p>
+    <p>SPC가 설비 투자 및 운영을 전담하고, 단지는 매출 기반 수수료를 수취하는 구조다.</p>
+    <ul>
+      <li><strong>파트너사:</strong> 아파트너 + 법무법인 더 에이치 황해 (또는 SPC 단독 운영)</li>
+      <li><strong>설비 공급:</strong> 오진양행 — 네슬레 공식 유통사, 에스프레소 머신 공급</li>
+      <li><strong>수익 구조:</strong> 판매 매출에서 SPC 수수료(파일럿 15%, 이후 20%)를 단지에 지급</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ─── 2. 단가·원가 구조 ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">SECTION 02</span>
+    단가 및 원가 구조
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40%">항목</th>
+          <th class="td-num" style="width:25%">금액</th>
+          <th style="width:35%">비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>잔당 원가 (원재료 + 인건비)</td>
+          <td class="td-num">2,166원</td>
+          <td>더테라스 원가 시트 기준</td>
+        </tr>
+        <tr>
+          <td>믹스 평균 판매가</td>
+          <td class="td-num">3,440원</td>
+          <td>타 단지 실제 가격 기준 (+100원)</td>
+        </tr>
+        <tr>
+          <td>쿠폰 가격</td>
+          <td class="td-num">2,500원</td>
+          <td>아메리카노 3,300원 대비 24% 할인</td>
+        </tr>
+        <tr>
+          <td><strong>현금 잔당 마진</strong></td>
+          <td class="td-num"><strong>1,274원</strong></td>
+          <td>마진율 37.0%</td>
+        </tr>
+        <tr>
+          <td><strong>쿠폰 잔당 마진</strong></td>
+          <td class="td-num"><strong>334원</strong></td>
+          <td>마진율 13.4%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <strong>쿠폰 구조 주의사항:</strong> 쿠폰 소비율이 높을수록 잔당 마진이 급감한다. 헬리오시티 실측에서 쿠폰 소비율 70%가 수익성 악화의 주요 원인으로 확인됐다.
+  </div>
+</div>
+
+<!-- ─── 3. 설비 투자 및 감가상각 ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">SECTION 03</span>
+    설비 투자 및 감가상각
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40%">항목</th>
+          <th class="td-num" style="width:25%">금액</th>
+          <th style="width:35%">비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>에스프레소 + 우유스팀 머신</td>
+          <td class="td-num">2,800만원 / 대</td>
+          <td>선불 구매, SPC 유형자산</td>
+        </tr>
+        <tr>
+          <td>에스프레소 전용 머신</td>
+          <td class="td-num">1,900만원 / 대</td>
+          <td>선불 구매</td>
+        </tr>
+        <tr>
+          <td>감가상각 (5년, 잔존가치 20%)</td>
+          <td class="td-num">월 40만원 / 대</td>
+          <td>정액법 적용</td>
+        </tr>
+        <tr>
+          <td>머신 2대 필요 기준</td>
+          <td class="td-num">일 200잔 초과</td>
+          <td>대용량 단지 적용</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <strong>감가상각 산식:</strong> (취득원가 − 잔존가치) ÷ 내용연수 = (3,000만 × 80%) ÷ 5년 = 연 480만원 → 월 40만원
+  </div>
+</div>
+
+<!-- ─── 4. 세대 규모별 단지 손익 시뮬레이션 ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">SECTION 04</span>
+    세대 규모별 단지 손익 시뮬레이션
+  </div>
+
+  <div class="prose">
+    <p><strong>시나리오 전제 조건</strong></p>
+    <ul>
+      <li>세대 가입률: 70%</li>
+      <li>쿠폰 소비율: 70%</li>
+      <li>일 평균 판매 잔수: 세대수 × 0.03 (예: 3,000세대 → 일 90잔)</li>
+      <li>인력 구성: 정규직 1명 + 파트타임 1명 (월 408만원)</li>
+      <li>월 운영비 (원두 등): 100만원</li>
+    </ul>
+  </div>
+
+  <div class="sub-header">1,000세대 단지</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40%">항목</th>
+          <th class="td-num" style="width:30%">Normal</th>
+          <th class="td-num" style="width:30%">Worst</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>월 판매 잔수</td>
+          <td class="td-num">900잔</td>
+          <td class="td-num">600잔</td>
+        </tr>
+        <tr>
+          <td>월 매출 (믹스 3,440원)</td>
+          <td class="td-num">309만원</td>
+          <td class="td-num">206만원</td>
+        </tr>
+        <tr>
+          <td>원가 (잔당 2,166원)</td>
+          <td class="td-num">195만원</td>
+          <td class="td-num">130만원</td>
+        </tr>
+        <tr>
+          <td>인건비</td>
+          <td class="td-num">408만원</td>
+          <td class="td-num">408만원</td>
+        </tr>
+        <tr>
+          <td>운영비</td>
+          <td class="td-num">100만원</td>
+          <td class="td-num">100만원</td>
+        </tr>
+        <tr>
+          <td>감가상각</td>
+          <td class="td-num">40만원</td>
+          <td class="td-num">40만원</td>
+        </tr>
+        <tr>
+          <td><strong>월 수익</strong></td>
+          <td class="td-num" style="color:#c0392b;font-weight:700">-434만원</td>
+          <td class="td-num" style="color:#c0392b;font-weight:700">-472만원</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <strong>결론:</strong> 1,000세대 규모는 Normal·Worst 모두 적자. 최소 2,000세대 이상 단지를 타깃해야 한다.
+  </div>
+
+  <div class="sub-header">2,000세대 단지</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40%">항목</th>
+          <th class="td-num" style="width:30%">Normal</th>
+          <th class="td-num" style="width:30%">Worst</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>월 판매 잔수</td>
+          <td class="td-num">1,800잔</td>
+          <td class="td-num">1,200잔</td>
+        </tr>
+        <tr>
+          <td>월 매출</td>
+          <td class="td-num">619만원</td>
+          <td class="td-num">413만원</td>
+        </tr>
+        <tr>
+          <td>원가</td>
+          <td class="td-num">390만원</td>
+          <td class="td-num">260만원</td>
+        </tr>
+        <tr>
+          <td>인건비</td>
+          <td class="td-num">408만원</td>
+          <td class="td-num">408만원</td>
+        </tr>
+        <tr>
+          <td>운영비</td>
+          <td class="td-num">100만원</td>
+          <td class="td-num">100만원</td>
+        </tr>
+        <tr>
+          <td>감가상각</td>
+          <td class="td-num">40만원</td>
+          <td class="td-num">40만원</td>
+        </tr>
+        <tr>
+          <td><strong>월 수익 (참고)</strong></td>
+          <td class="td-num" style="color:#c0392b;font-weight:700">-319만원</td>
+          <td class="td-num" style="color:#c0392b;font-weight:700">-395만원</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sub-header">확정 수치 기반 시뮬레이션 (v5.4 기준)</div>
+  <div class="callout" style="margin-bottom:16px">
+    쿠폰 구조 및 판매 단가 반영 후 확정 수치. 위 참고치와 차이가 있으며, 아래 수치를 공식 기준으로 사용한다.
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>세대</th>
+          <th>시나리오</th>
+          <th class="td-num">단지 월 수익</th>
+          <th class="td-num">SPC 수수료 (월)</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-center">2,000</td>
+          <td>Worst</td>
+          <td class="td-num" style="color:#27ae60;font-weight:700">+74만원</td>
+          <td class="td-num">별도</td>
+          <td>흑자 유지 (하한선)</td>
+        </tr>
+        <tr>
+          <td class="td-center">3,000</td>
+          <td>Normal (정규1 + 파트1)</td>
+          <td class="td-num" style="color:#27ae60;font-weight:700">+384만원</td>
+          <td class="td-num">554만원</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="td-center">3,000</td>
+          <td>Normal (파트타임 2명)</td>
+          <td class="td-num" style="color:#27ae60;font-weight:700">+476만원</td>
+          <td class="td-num">554만원</td>
+          <td>인건비 절감 효과</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── 5. SPC 수익 시뮬레이션 ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">SECTION 05</span>
+    SPC 수익 시뮬레이션 (단지 수 확장)
+  </div>
+  <div class="prose">
+    <p>수수료율: 파일럿(10개 단지 이하) <strong>15%</strong>, 이후 <strong>20%</strong></p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="td-center" style="width:15%">단지 수</th>
+          <th class="td-center" style="width:15%">평균 세대</th>
+          <th class="td-num" style="width:20%">SPC 월 수수료</th>
+          <th class="td-num" style="width:20%">SPC 연 수수료</th>
+          <th style="width:30%">비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-center">3</td>
+          <td class="td-center">3,000</td>
+          <td class="td-num">1,662만원</td>
+          <td class="td-num">2.0억원</td>
+          <td>파일럿 단계 (15%)</td>
+        </tr>
+        <tr>
+          <td class="td-center">5</td>
+          <td class="td-center">3,000</td>
+          <td class="td-num">2,770만원</td>
+          <td class="td-num">3.3억원</td>
+          <td>파일럿 단계</td>
+        </tr>
+        <tr>
+          <td class="td-center">10</td>
+          <td class="td-center">3,000</td>
+          <td class="td-num">5,540만원</td>
+          <td class="td-num">6.6억원</td>
+          <td>20% 수수료 전환</td>
+        </tr>
+        <tr>
+          <td class="td-center">20</td>
+          <td class="td-center">2,500</td>
+          <td class="td-num">9,240만원</td>
+          <td class="td-num">11.1억원</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="td-center"><strong>50</strong></td>
+          <td class="td-center"><strong>2,500</strong></td>
+          <td class="td-num"><strong>2.3억원</strong></td>
+          <td class="td-num"><strong>27.7억원</strong></td>
+          <td><strong>목표 단계</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── 6. 초기 투자 및 손익분기 ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">SECTION 06</span>
+    초기 투자 및 손익분기
+  </div>
+
+  <div class="sub-header">3개 단지 파일럿 초기 투자</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:60%">항목</th>
+          <th class="td-num" style="width:40%">금액</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>에스프레소 머신 3대 (2,800만원 × 3)</td>
+          <td class="td-num">8,400만원</td>
+        </tr>
+        <tr>
+          <td>인테리어 및 설비 (추정)</td>
+          <td class="td-num">3,000만원</td>
+        </tr>
+        <tr>
+          <td>초기 원두 및 자재</td>
+          <td class="td-num">300만원</td>
+        </tr>
+        <tr>
+          <td>운영 자금 (3개월)</td>
+          <td class="td-num">3,000만원</td>
+        </tr>
+        <tr>
+          <td><strong>합계</strong></td>
+          <td class="td-num"><strong>약 1억 5,000만원</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sub-header">손익분기 분석</div>
+  <div class="prose">
+    <ul>
+      <li><strong>표준 확장형 기준:</strong> 약 12개 단지 운영 시점에서 손익분기 도달</li>
+      <li><strong>파일럿 3개 단지:</strong> SPC 월 수수료 1,662만원 → 연간 약 2.0억원 → 투자 회수 기간 1년 이내</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ─── 7. 헬리오시티 실측 vs 개선안 ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">SECTION 07</span>
+    헬리오시티 실측 vs 개선안
+  </div>
+  <div class="prose">
+    <p>헬리오시티(9,510세대) 실측 데이터 기반으로 현행 운영 문제점 및 개선안을 제시한다.</p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:30%">항목</th>
+          <th class="td-num" style="width:30%">현행</th>
+          <th class="td-num" style="width:40%">개선안</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>월 매출</td>
+          <td class="td-num">4,700만원</td>
+          <td class="td-num">4,700만원</td>
+        </tr>
+        <tr>
+          <td>쿠폰 소비율</td>
+          <td class="td-num">70%</td>
+          <td class="td-num">50%로 조정</td>
+        </tr>
+        <tr>
+          <td>인건비 (인력)</td>
+          <td class="td-num">2,750만원 (11명)</td>
+          <td class="td-num">1,500만원 (6명)</td>
+        </tr>
+        <tr>
+          <td>쿠폰 원가</td>
+          <td class="td-num">1,800원 / 잔</td>
+          <td class="td-num">구조 변경</td>
+        </tr>
+        <tr>
+          <td><strong>월 적자</strong></td>
+          <td class="td-num" style="color:#c0392b;font-weight:700">-3,900만원</td>
+          <td class="td-num" style="color:#e67e22;font-weight:700">-1,800 ~ -2,300만원</td>
+        </tr>
+        <tr>
+          <td><strong>개선 효과</strong></td>
+          <td class="td-num">—</td>
+          <td class="td-num" style="color:#27ae60;font-weight:700">+1,600 ~ +2,000만원</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <strong>핵심 개선 방향:</strong> (1) 쿠폰 소비율 70% → 50% 조정으로 잔당 마진 회복, (2) 인력 11명 → 6명으로 최적화하여 월 1,250만원 인건비 절감.
+  </div>
+</div>
+
+<!-- ─── 8. 리스크 및 대응 ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">SECTION 08</span>
+    리스크 및 대응 방안
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:45%">리스크</th>
+          <th style="width:55%">대응 방안</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>스타벅스 직영 매장이 있는 단지</td>
+          <td>네슬레 라이센스 승인 어려움 → 타깃 단지에서 사전 제외</td>
+        </tr>
+        <tr>
+          <td>네슬레 라이센스 거부</td>
+          <td>오진양행(네슬레 공식 유통사)을 통한 사전 협의 진행</td>
+        </tr>
+        <tr>
+          <td>관리비 항목 적법성 문제</td>
+          <td>장기수선충당금 및 잡수입 항목 법률 검토 (법무법인 더 에이치 황해)</td>
+        </tr>
+        <tr>
+          <td>인건비 상승</td>
+          <td>파트타임 인력 비중 조정 및 운영 효율화</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<div style="text-align:center; padding:32px; color:#a0aec0; font-size:12px;">
+  WPS SPC 재무 시뮬레이션 v5.4 &nbsp;·&nbsp; 2026.04 &nbsp;·&nbsp; 성현우 국장 &nbsp;·&nbsp; Confidential
+</div>
+
+</body>
+</html>
